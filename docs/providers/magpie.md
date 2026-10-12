@@ -23,7 +23,7 @@ asyncio.run(main())
 
 ## Authentication
 
-Magpie holds the upstream credentials, so Republic needs none. When `REPUBLIC_MAGPIE_API_KEY` or `api_key=` is set, it is sent in the `Authorization: Bearer` header.
+Magpie holds the upstream credentials, so you don't need to supply a key. Republic sends the default key `magpie` in the `Authorization: Bearer` header. Pass `api_key=` to send a different key, or `auth=` to replace the header.
 
 ## Model support
 
