@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Self, TypeVar
 
 import httpx2
 
+from republic._extensions import _active, _observe
 from republic._response import ModelInfo
 from republic.auth import Auth, HeaderAuth
 from republic.errors import (
@@ -25,6 +26,7 @@ from republic.errors import (
     UnsupportedApiFormatError,
     UnsupportedFeatureError,
 )
+from republic.extensions import Extension
 from republic.formats import _API_FORMATS, ApiFormatName
 from republic.formats._base import (
     ApiFormat,
@@ -82,6 +84,7 @@ class Provider:
         max_retries: int = 2,
         retry_delay: float = 0.5,
         max_retry_delay: float = 60,
+        extensions: Sequence[Extension] = (),
     ) -> None:
         if isinstance(max_retries, bool) or not isinstance(max_retries, int) or max_retries < 0:
             raise ValueError("max_retries must be a nonnegative integer")
@@ -111,6 +114,7 @@ class Provider:
         self.max_retries = max_retries
         self.retry_delay = retry_delay
         self.max_retry_delay = max_retry_delay
+        self.extensions = tuple(extensions)
         self._http_client = http_client
         self._owns_http_client = http_client is None
         self._client_loop: asyncio.AbstractEventLoop | None = None
@@ -189,26 +193,28 @@ class Provider:
 
     async def list_models(self) -> list[ModelInfo]:
         """List the models the service offers to these credentials, following every page."""
-        if self.MODELS_PATH is None:
-            raise UnsupportedFeatureError(f"Provider {self.name!r} cannot list models")
-        api_format = _API_FORMATS[self.api_format or self.SUPPORTED_API_FORMATS[0]]
-        headers = {**api_format.headers, **self.headers}
-        auth = httpx2.USE_CLIENT_DEFAULT if self.auth is None else self.auth
-        models: list[ModelInfo] = []
-        params = self._models_params(None)
-        client = self._client()
-        while params is not None:
-            response = await self._retry(
-                lambda params=params: client.get(
-                    f"{self.api_base}{self.MODELS_PATH}", params=params, headers=headers, auth=auth
+        with _observe(self, "list_models") as observation:
+            if self.MODELS_PATH is None:
+                raise UnsupportedFeatureError(f"Provider {self.name!r} cannot list models")
+            api_format = _API_FORMATS[self.api_format or self.SUPPORTED_API_FORMATS[0]]
+            headers = {**api_format.headers, **self.headers}
+            auth = httpx2.USE_CLIENT_DEFAULT if self.auth is None else self.auth
+            models: list[ModelInfo] = []
+            params = self._models_params(None)
+            client = self._client()
+            while params is not None:
+                response = await self._retry(
+                    lambda params=params: client.get(
+                        f"{self.api_base}{self.MODELS_PATH}", params=params, headers=headers, auth=auth
+                    )
                 )
-            )
-            if response.is_error:
-                raise APIStatusError(response.status_code, response.text, headers=response.headers)
-            data = response.json()
-            models.extend(self._parse_models(data))
-            params = self._models_params(data)
-        return models
+                if response.is_error:
+                    raise APIStatusError(response.status_code, response.text, headers=response.headers)
+                data = response.json()
+                models.extend(self._parse_models(data))
+                params = self._models_params(data)
+            observation.response = models
+            return models
 
     def _models_params(self, previous: Any) -> dict[str, str] | None:
         """Query parameters for the next page of models, or ``None`` when ``previous`` was the last.
@@ -269,6 +275,7 @@ class Provider:
 
     async def _retry(self, send: Callable[[], Awaitable[httpx2.Response]]) -> httpx2.Response:
         """Retry only the request, never replay a successful streaming response."""
+        observation = _active(self)
         for attempt in range(self.max_retries + 1):
             headers: Mapping[str, str] = {}
             try:
@@ -277,6 +284,8 @@ class Provider:
                 retryable = isinstance(exc, (httpx2.TimeoutException, httpx2.NetworkError, httpx2.RemoteProtocolError))
                 if not retryable or attempt == self.max_retries:
                     raise _connection_error(exc) from exc
+                error = _connection_error(exc)
+                error.__cause__ = exc
             else:
                 if attempt == self.max_retries or not (
                     response.status_code in {408, 409, 429} or response.status_code >= 500
@@ -285,11 +294,15 @@ class Provider:
                 headers = dict(response.headers)
                 # Release the response before sleeping, including unread SSE error bodies.
                 await response.aclose()
+                error = APIStatusError(response.status_code, "", headers=headers)
             delay = _retry_after(headers)
             if delay is None:
                 delay = min(self.max_retry_delay, self.retry_delay * 2 ** min(attempt, 30))
                 delay *= random.uniform(0.75, 1)  # noqa: S311 - retry jitter, not cryptography
-            await asyncio.sleep(min(delay, self.max_retry_delay))
+            delay = min(delay, self.max_retry_delay)
+            if observation is not None:
+                observation.retry(error, attempt + 1, delay)
+            await asyncio.sleep(delay)
         raise AssertionError("Unreachable retry state")
 
     def _client(self) -> httpx2.AsyncClient:

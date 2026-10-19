@@ -18,6 +18,7 @@ These options apply to `get_provider()` and the model factories, including `get_
 | `max_retries` | Additional attempts after a retryable failure; default is 2, and 0 disables retries |
 | `retry_delay` | Initial exponential backoff in seconds; default is 0.5, with jitter |
 | `max_retry_delay` | Maximum wait between attempts, including `Retry-After`; default is 60 seconds |
+| `extensions` | Optional `Extension` instances; empty by default |
 
 `api_key`, `api_base`, and `env_prefix` treat `None` and an empty string as absent. An empty string does not disable environment lookup.
 
@@ -114,6 +115,52 @@ Retries wait with exponential backoff and jitter. A valid `retry-after-ms` or `R
 For a stream, only the initial request can be retried. Once a successful HTTP response is opened, Republic never replays it, even if reading fails before the first event. Transport failures raise `errors.APIConnectionError` or its `errors.APITimeoutError` subclass, with the original exception as `__cause__`. Cancellation propagates without a retry.
 
 A timeout can occur after the service accepted a request. Retrying can therefore produce another generation or repeat a provider-run tool operation; set `max_retries=0` when your application requires a single attempt.
+
+## Extensions
+
+Subclass `Extension` and pass configured instances through `extensions=` on a Provider or model factory. Override any of its three methods; defaults do nothing.
+
+```python
+import logging
+
+import republic
+from republic.extensions import Extension
+
+
+class CallLog(Extension):
+    def __init__(self, logger):
+        self.logger = logger
+
+    def on_start(self, provider, operation, model):
+        return f"{provider}:{model or operation}"
+
+    def on_retry(self, context, error, attempt, delay):
+        self.logger.info("%s retry %s in %ss", context, attempt, delay)
+
+    def on_finish(self, context, response, error):
+        error_type = type(error).__name__ if error is not None else None
+        self.logger.info("%s finished: error=%s", context, error_type)
+
+
+model = republic.get_model(
+    "openai:gpt-6-sol",
+    extensions=[CallLog(logging.getLogger("myapp.calls"))],
+)
+```
+
+| Method | Notification |
+| --- | --- |
+| `on_start(provider, operation, model)` | A call starts; streams start on context entry. Return any per-call state needed by this extension. |
+| `on_retry(context, error, attempt, delay)` | A retry is scheduled, after releasing the failed response and before waiting. Attempt numbers start at 1 for each HTTP retry loop, including each model-list page. |
+| `on_finish(context, response, error)` | Exactly one terminal outcome, carrying the returned response or the original error when available. |
+
+`provider` is the provider name. Operations are `chat`, `stream`, `embed` (including batches), `generate`, `edit`, `decide`, and `list_models`; listing has `model=None` and returns a list. Each extension receives its own `on_start` return value unchanged as `context` in subsequent methods for that call. The default is `None`, also used if `on_start` fails. Return a fresh value when keeping mutable per-call state, so overlapping calls can be observed independently.
+
+Response and error may both be present when output validation or history writing fails. The response retains text and usage; `output` is `None` on validation failure and retains the validated value on history failure. Both arguments are absent when an entered stream closes without completing a response.
+
+Successful streams notify before `Completed`, once validation and history writing succeed. Later context exit or consumer exceptions do not change that result. Constructing a stream without entering it produces no notifications. Cancellation during the call reaches both the extension and caller as the original exception.
+
+Methods run synchronously in registration order. Retry and finish return values are ignored; extension failures are logged and isolated, including explicitly raised `CancelledError`. Async methods are unsupported. Return promptly and do not mutate borrowed responses. HTTP hooks, authentication and timeouts remain on the HTTP client; extensions do not change retry policy.
 
 ## Response diagnostics
 
