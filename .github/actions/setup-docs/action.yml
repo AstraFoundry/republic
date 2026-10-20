@@ -1,0 +1,9 @@
+name: Setup documentation tooling
+description: Install uv for the isolated external Zensical documentation command
+runs:
+  using: composite
+  steps:
+    - uses: astral-sh/setup-uv@v10.2.0
+      with:
+        version: "0.9.21"
+        enable-cache: false

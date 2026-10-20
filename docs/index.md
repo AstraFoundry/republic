@@ -8,5 +8,6 @@ Start with the [quickstart](quickstart.md), choose a [provider](providers/index.
 then see [configuration](reference/configuration.md) and the
 [API reference](reference/provider-api.md).
 
-The Go implementation runs independently of Python. The repository retains the
-original Python implementation exclusively for compatibility testing.
+The library and all tests run with Go alone. Frozen original-behavior baselines
+and protocol recordings in testdata preserve compatibility checks without a
+second runtime implementation.

@@ -1,22 +1,18 @@
 .PHONY: install check test parity build docs-test docs fuzz
 
-install: ## Install Go dependencies and Python compatibility tooling
+install: ## Download Go dependencies
 	go mod download
-	uv sync
-	uv run prek install
 
-check: ## Check the Go implementation and retained Python oracle
+check: ## Check Go formatting, static analysis and patch whitespace
 	test -z "$$(gofmt -l *.go examples/chat/*.go)"
 	go vet ./...
-	uv run prek run --all-files
-	uv run ty check
+	git diff --check
 
-test: ## Run native Go behavior and race tests
+test: ## Run Go behavior, compatibility and race tests
 	go test -race -cover ./...
 
-parity: ## Compare Go with Python and run the original suite
-	REPUBLIC_PYTHON_PARITY=1 go test ./...
-	uv run pytest -q
+parity: ## Check the frozen original-behavior baselines using Go only
+	go test -run 'Test(Request|Response)Compatibility|TestRecordedProtocols' ./...
 
 build: ## Build Go packages and examples
 	go build ./...
@@ -25,10 +21,10 @@ fuzz: ## Exercise parser and message decoder fuzz targets
 	go test -run '^$$' -fuzz '^FuzzStreamParser$$' -fuzztime=10s
 	go test -run '^$$' -fuzz '^FuzzMessageJSON$$' -fuzztime=10s
 
-docs-test: ## Build documentation with strict checks
-	uv run --frozen --group docs zensical build --clean --strict
+docs-test: ## Build documentation using the external Zensical tool
+	uvx --from zensical==0.0.69 zensical build --clean --strict
 
-docs: ## Serve documentation locally
-	uv run --frozen --group docs zensical serve
+docs: ## Preview documentation using the external Zensical tool
+	uvx --from zensical==0.0.69 zensical serve
 
 .DEFAULT_GOAL := test

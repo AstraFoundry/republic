@@ -1,0 +1,1823 @@
+{
+  "fantasy_chat_multi_tool/0.json": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_2wt6qUGrlxczUadZYf3qXyH0",
+          "name": "add",
+          "arguments": "{\"a\": 2, \"b\": 3}"
+        },
+        {
+          "id": "call_vZOWZaH7tzu0rLZeogtafvrf",
+          "name": "multiply",
+          "arguments": "{\"a\": 2, \"b\": 3}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 110,
+      "output_tokens": 50,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "chatcmpl-DuLdUO0Pvm9IhUmV9qCj30FQ6gQrs",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_chat_multi_tool/1.json": {
+    "message": {
+      "role": "assistant",
+      "content": "The sum of 2 and 3 is 5, and the product of 2 and 3 is 6."
+    },
+    "token_usage": {
+      "input_tokens": 176,
+      "output_tokens": 26,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "chatcmpl-DuLdVFrPbAOC3f0eWQVTpsjwZoeQ4",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_chat_multi_tool_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_cclGbjTQkZDEnnHrRiU0n7NO",
+          "name": "add",
+          "arguments": "{\"a\": 2, \"b\": 3}"
+        },
+        {
+          "id": "call_Nob2SzTcxIjro1HvSBPQS6XG",
+          "name": "multiply",
+          "arguments": "{\"a\": 2, \"b\": 3}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 106,
+      "output_tokens": 50,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "chatcmpl-DuLdWOILVCVVrpY7aRAWaTdcPyWSy",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "UsageDelta",
+      "ToolCallReady",
+      "ToolCallReady"
+    ]
+  },
+  "fantasy_chat_multi_tool_streaming/1.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "The sum of 2 and 3 is 5, and the product of 2 and 3 is 6."
+    },
+    "token_usage": {
+      "input_tokens": 172,
+      "output_tokens": 26,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "chatcmpl-DuLdYWgDBTb4Am3saOR9aPajzKbJy",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_chat_simple/0.json": {
+    "message": {
+      "role": "assistant",
+      "content": "Ol\u00e1!"
+    },
+    "token_usage": {
+      "input_tokens": 20,
+      "output_tokens": 2,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "chatcmpl-DuLdOKeSvJ2ah93ut8DRAVP44PlmE",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_chat_simple_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "Ol\u00e1!"
+    },
+    "token_usage": {
+      "input_tokens": 20,
+      "output_tokens": 2,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "chatcmpl-DuLdOuviL2tiVxMim6HmX4YMnCorK",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_chat_tool/0.json": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_15X0Q2MmkK1IeFfiol9LFlqb",
+          "name": "weather",
+          "arguments": "{\"location\":\"Florence, Italy\"}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 61,
+      "output_tokens": 16,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "chatcmpl-DuLdP8CI4un8TWs1V8tS3xfFpq7Ta",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_chat_tool/1.json": {
+    "message": {
+      "role": "assistant",
+      "content": "The current weather in Florence, Italy is 40\u00b0C."
+    },
+    "token_usage": {
+      "input_tokens": 86,
+      "output_tokens": 13,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "chatcmpl-DuLdRO4UKukXzWLIIHKFM5Rxu03mY",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_chat_tool_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_qLFv8oQOs68qRuEVmG8TuEJp",
+          "name": "weather",
+          "arguments": "{\"location\":\"Florence,Italy\"}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 61,
+      "output_tokens": 16,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "chatcmpl-DuLdRJdgsTDkaWQbovITznUPevjfI",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "UsageDelta",
+      "ToolCallReady"
+    ]
+  },
+  "fantasy_chat_tool_streaming/1.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "The current temperature in Florence, Italy is 40\u00b0C."
+    },
+    "token_usage": {
+      "input_tokens": 86,
+      "output_tokens": 13,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "chatcmpl-DuLdSir8kzAQMIjRl1tG2YC59CjR1",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_gemini_multi_tool/0.json": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_2fe54714cff844d2ac984932db5eb6cd",
+          "name": "add",
+          "arguments": "{\"a\": 2, \"b\": 3}",
+          "metadata": {
+            "gemini_thought_signature": "CuwBAb4+9vtZI+lrRvvljZUdJ6DU+6mx0MOBuaHeyYvynuM3jWA6+2QLszYeEbDE8DiwXn/ZAT193VbikJsMKQhtnfKfRBEBOX0+ubVHHOFBFJQtdbOgB/rUa60EsYG3tEz3IfShPYThhVkawFMK6pypIEeFkR6fz4ORTLkqD2LIDzASds2DgReWzjuQ5TxX2rVB/ZyGarvY5Wvg2TkeK2hAcVdJIjwLZFtxTKnd2DU6smy4Elld36CV8HsEd1P+qbChmOc7V473H9RyZbkojG0ItvQepZX7c0qcJRs2xGpz68rno2xpy+XlQOfnUXg="
+          }
+        },
+        {
+          "id": "call_cc39fe25f4ca4bf893ef1a2a074c129c",
+          "name": "multiply",
+          "arguments": "{\"a\": 2, \"b\": 3}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 125,
+      "output_tokens": 109,
+      "reasoning_tokens": 73,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "WwCzadOqH-mtz7IP8_Se8Ak",
+    "model": "gemini-2.5-flash",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_gemini_multi_tool/1.json": {
+    "message": {
+      "role": "assistant",
+      "content": "The sum of 2 and 3 is 5. The product of 2 and 3 is 6."
+    },
+    "token_usage": {
+      "input_tokens": 185,
+      "output_tokens": 24,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "XACzab6NJ-Hqz7IP6avj8Qs",
+    "model": "gemini-2.5-flash",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_gemini_multi_tool_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_89cefcca3bb040c7a6cced25e4108486",
+          "name": "add",
+          "arguments": "{\"b\": 3, \"a\": 2}",
+          "metadata": {
+            "gemini_thought_signature": "CloBvj72+4/aTlyeodvVsF6WQseQLaqynO0Ocu6hCxSIV1rJCGFv67dtpjtFqWaborKte+82ZXWG2DaoPZaL+k7ONU3tUVwUXH0yI3ADtb46NJAqGWp2V/Ht3uMKhQEBvj72+53r7rtJS2JS+RSr/gNHTgRy4DDPTPtEEj+K6F4GFNMQEXVmXPYPa87j/74GGwi14Qwvde1kfemWz/+cRwpf2EDDKELVYuZ56LWb6pmPj4kyXPBERjn3dCiTrAhaysdd21dD0/t3xSXCKNFbPTDjK6IeGzqAGRFeL5D37oKPrh2N"
+          }
+        },
+        {
+          "id": "call_516cd9563b204a17994339e0b7c67eef",
+          "name": "multiply",
+          "arguments": "{\"a\": 2, \"b\": 3}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 121,
+      "output_tokens": 74,
+      "reasoning_tokens": 38,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "XQCzaYWvIqfRz7IPupTlyAk",
+    "model": "gemini-2.5-flash",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_gemini_multi_tool_streaming/1.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "The sum of 2 and 3 is 5. The product of 2 and 3 is 6."
+    },
+    "token_usage": {
+      "input_tokens": 218,
+      "output_tokens": 22,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "XgCzaazDItHRz7IPmsmB4Qk",
+    "model": "gemini-2.5-flash",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta",
+      "TextDelta",
+      "UsageDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_gemini_simple/0.json": {
+    "message": {
+      "role": "assistant",
+      "content": "Ol\u00e1!"
+    },
+    "token_usage": {
+      "input_tokens": 11,
+      "output_tokens": 26,
+      "reasoning_tokens": 24,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "VgCzac2AGLOHz7IP2pOkkAI",
+    "model": "gemini-2.5-flash",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_gemini_simple_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "Ol\u00e1!"
+    },
+    "token_usage": {
+      "input_tokens": 11,
+      "output_tokens": 23,
+      "reasoning_tokens": 21,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "VwCzabneCuzPz7IP0aL64A0",
+    "model": "gemini-2.5-flash",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_gemini_tool/0.json": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_9c7a0bda160b40de8a19ec3237b557e1",
+          "name": "weather",
+          "arguments": "{\"location\": \"Florence,Italy\"}",
+          "metadata": {
+            "gemini_thought_signature": "CvMBAb4+9vvZC/KtDBiEfP1WF+wUiObd6G6yg5vTA8dfeleB3pTysSfmipkwxCrjEL9Y29JxnkMMXZvzkVMlyiK01pvWtZ++SnHMyuy9J04IrT/6oDhaDculJL+1gJhI+4i1UlPgJBXlUnpkPcznVuYKh6YEvWhNQc3Wrz305DeBdPIb2WmZmGv2gOVlhL3yjUrmxVWuRrtt9bQHX9B29bKtvY6L5QnE+iXEDpDlB6N5Qoe0JDqjJMn2K4WmVbxXivQN+XcYrEeRbV8v0A3yKIIxozry6h8C5cWiqMcXdaPK+tDNq4+tljWouipUhKvSkQY1yQ3K"
+          }
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 54,
+      "output_tokens": 63,
+      "reasoning_tokens": 48,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "WACzacOoAtThz7IPuNuJoQI",
+    "model": "gemini-2.5-flash",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_gemini_tool/1.json": {
+    "message": {
+      "role": "assistant",
+      "content": "The weather in Florence, Italy is 40 C."
+    },
+    "token_usage": {
+      "input_tokens": 84,
+      "output_tokens": 12,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "WQCzaa2iA_Xpz7IP6oC2oQ8",
+    "model": "gemini-2.5-flash",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_gemini_tool_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_f801b8b7e9fc49b3b457420b7d7874a3",
+          "name": "weather",
+          "arguments": "{\"location\": \"Florence,Italy\"}",
+          "metadata": {
+            "gemini_thought_signature": "CiQBvj72+xCKZ6n2ewHIHg3nIWfu6zy4Znh/TJTlgZMDBj7UcfoKZwG+Pvb7HC0+ds8yTx13X71T68CdLhgHBq/EHSe1cdetUYt/hbcv5aJy5o7Bhux5fWqkmSsGNBs9HiMdsbRqRN4YXh9UR3LTnYuV7Bp0gR8nIE/QLK2BQtGNxrxaD8scXwvrZ2q3izMKmgEBvj72++/EmTKY6Vq77EISxk0GbpbjN6ypU29fapjcLCRtNSNfgpdcqgMgWIGqH6E9d20r2UYGXgyGsx5cdtWBvI0q5dQwy2xATovEZNRPNJC/+vY0yBsTojt61TKhp26PJ5fIdu02X8RN89S15Xr3egRayx72aPeUzfheqRxqGWjiMcbK4EWyiX+UxHHFqKTppeSRhBjtMdse"
+          }
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 54,
+      "output_tokens": 58,
+      "reasoning_tokens": 43,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "WQCzaayhL8Xmz7IP-63dqQk",
+    "model": "gemini-2.5-flash",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_gemini_tool_streaming/1.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "The weather in Florence,Italy is 40 C."
+    },
+    "token_usage": {
+      "input_tokens": 127,
+      "output_tokens": 12,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "WgCzaZzmMLnoz7IP_czm6Q4",
+    "model": "gemini-2.5-flash",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_messages_multi_tool/0.json": {
+    "message": {
+      "role": "assistant",
+      "content": "I'll add and multiply the numbers 2 and 3 for you.",
+      "tool_calls": [
+        {
+          "id": "toolu_01StBeRxDEwsqcc3arbDgpS9",
+          "name": "add",
+          "arguments": "{\"a\": 2, \"b\": 3}"
+        },
+        {
+          "id": "toolu_01AC6WQhj2iRkdYHgTAGMpVQ",
+          "name": "multiply",
+          "arguments": "{\"a\": 2, \"b\": 3}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 507,
+      "output_tokens": 137,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_01SKkVkB84yWcweNDwx31xBd",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "TextDelta",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_messages_multi_tool/1.json": {
+    "message": {
+      "role": "assistant",
+      "content": "The results are:\n- 2 + 3 = 5\n- 2 \u00d7 3 = 6"
+    },
+    "token_usage": {
+      "input_tokens": 705,
+      "output_tokens": 31,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_01M4yocU9cfPhGbLv7iwpG2g",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_messages_multi_tool_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "I'll add and multiply the numbers 2 and 3 for you.",
+      "tool_calls": [
+        {
+          "id": "toolu_01UYxUYC2zRPY8wiutnF48eP",
+          "name": "add",
+          "arguments": "{\"a\": 2, \"b\": 3}"
+        },
+        {
+          "id": "toolu_01VaRx1jpWCvPhi7L4kywAcd",
+          "name": "multiply",
+          "arguments": "{\"a\": 2, \"b\": 3}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 502,
+      "output_tokens": 137,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_01PSvJdjd5keNSD63VHjYzex",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "UsageDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_messages_multi_tool_streaming/1.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "The results are:\n- 2 + 3 = 5\n- 2 \u00d7 3 = 6"
+    },
+    "token_usage": {
+      "input_tokens": 700,
+      "output_tokens": 31,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_015WPQbJC4ysDAi7LuCD43Fp",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "UsageDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_messages_simple/0.json": {
+    "message": {
+      "role": "assistant",
+      "content": "Ol\u00e1! \n\n(That's \"hello\" in Portuguese. You could also say \"Oi!\" for a more casual \"hi!\")"
+    },
+    "token_usage": {
+      "input_tokens": 16,
+      "output_tokens": 34,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_01KrnBffuzxt8ttHq7iiZe7n",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_messages_simple_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "Ol\u00e1! (That's \"hi\" in Portuguese)\n\nYou could also say \"Oi!\" which is a more casual way to say hi in Portuguese."
+    },
+    "token_usage": {
+      "input_tokens": 16,
+      "output_tokens": 38,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_01R8GdyyLQUhUfyjqSCMbnWg",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "UsageDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_messages_tool/0.json": {
+    "message": {
+      "role": "assistant",
+      "content": "I'll check the weather in Florence, Italy for you.",
+      "tool_calls": [
+        {
+          "id": "toolu_01XLb9pzgfLa2EMyqWot6Ezt",
+          "name": "weather",
+          "arguments": "{\"location\": \"Florence,Italy\"}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 394,
+      "output_tokens": 66,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_01Pgx1ep9weiiD4acPmkJCeK",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "TextDelta",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_messages_tool/1.json": {
+    "message": {
+      "role": "assistant",
+      "content": "The current weather in Florence, Italy is 40\u00b0C (104\u00b0F). That's quite hot! It would be a good idea to stay hydrated and seek shade or air conditioning if you're planning to be outdoors."
+    },
+    "token_usage": {
+      "input_tokens": 475,
+      "output_tokens": 50,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_01Eo6XiNE3nm8rTR4yBWaEAg",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_messages_tool_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "I'll get the weather information for Florence, Italy for you.",
+      "tool_calls": [
+        {
+          "id": "toolu_01N2eM4V43kGCDkq2Lw7ChWQ",
+          "name": "weather",
+          "arguments": "{\"location\": \"Florence,Italy\"}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 394,
+      "output_tokens": 67,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_01Kgk6kMJLdJJC26r3uFwpRU",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "UsageDelta",
+      "TextDelta",
+      "TextDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_messages_tool_streaming/1.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "The current weather in Florence, Italy shows a temperature of 40\u00b0C (104\u00b0F). That's quite hot! Make sure to stay hydrated and seek shade if you're planning to be outdoors."
+    },
+    "token_usage": {
+      "input_tokens": 476,
+      "output_tokens": 46,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_01Kx5NVw2m4AvAyCQQ5zV4pU",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "UsageDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_responses_multi_tool/0.json": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_4duuhyRqgE5yacjdB7N3qLs3",
+          "name": "add",
+          "arguments": "{\"a\":2,\"b\":3}"
+        },
+        {
+          "id": "call_R9NaXdicUFYsl6ROHrFdxe2A",
+          "name": "multiply",
+          "arguments": "{\"a\":2,\"b\":3}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 108,
+      "output_tokens": 51,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_0080d7ac46927739016a3c1210cb8481a08ebce3627ac5b681",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_responses_multi_tool/1.json": {
+    "message": {
+      "role": "assistant",
+      "content": "The results are as follows:\n- **Addition**: 2 + 3 = 5\n- **Multiplication**: 2 \u00d7 3 = 6"
+    },
+    "token_usage": {
+      "input_tokens": 154,
+      "output_tokens": 36,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_04d1a373cc2cf018016a3c12123434819cb99f7203d1a18223",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_responses_multi_tool_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_ZckkKeJQwcJPC27VXT61xFLf",
+          "name": "add",
+          "arguments": "{\"a\":2,\"b\":3}"
+        },
+        {
+          "id": "call_M9h2AZgoLEv6q5gkex1QMtm2",
+          "name": "multiply",
+          "arguments": "{\"a\":2,\"b\":3}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 104,
+      "output_tokens": 51,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_00483e9118f52e4c016a3c1214d5d8819da2ca22014dbd1961",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_responses_multi_tool_streaming/1.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "The sum of 2 and 3 is **5**, and the product of 2 and 3 is **6**."
+    },
+    "token_usage": {
+      "input_tokens": 150,
+      "output_tokens": 28,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_0ff54135c0daf028016a3c12165ba8819c8c4a4e07fe1d964b",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_responses_simple/0.json": {
+    "message": {
+      "role": "assistant",
+      "content": "Ol\u00e1!"
+    },
+    "token_usage": {
+      "input_tokens": 20,
+      "output_tokens": 3,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_0f8d9108fdddf23b016a3c1209558c819f839aa6a3efc268a1",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_responses_simple_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "Hi in Portuguese is \"Oi!\""
+    },
+    "token_usage": {
+      "input_tokens": 20,
+      "output_tokens": 8,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_0a6fc3349e38704d016a3c120ac63c819e941b6f18b7170ff4",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_responses_tool/0.json": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_XX4zIshrJWNnM1Z3n6XsaSxP",
+          "name": "weather",
+          "arguments": "{\"location\":\"Florence, Italy\"}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 58,
+      "output_tokens": 17,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_0d9e9b38807e0d8a016a3c120baedc81a18f24ab933f2193f9",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_responses_tool/1.json": {
+    "message": {
+      "role": "assistant",
+      "content": "The weather in Florence, Italy, is currently 40\u00b0C."
+    },
+    "token_usage": {
+      "input_tokens": 81,
+      "output_tokens": 15,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_039f329dbed97aa5016a3c120d2fc081a3b9e3bec252760583",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_responses_tool_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_4TL7SrUyTg60nSUcfgeWLFXO",
+          "name": "weather",
+          "arguments": "{\"location\":\"Florence, Italy\"}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 58,
+      "output_tokens": 17,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_0befc33218ec8037016a3c120e5510819d9df02eea96fc61ae",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "fantasy_responses_tool_streaming/1.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "The current temperature in Florence, Italy, is 40\u00b0C. If you need more details or forecasts, let me know!"
+    },
+    "token_usage": {
+      "input_tokens": 81,
+      "output_tokens": 27,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_051d610521e34f94016a3c120fa1a0819da4d3a5e758050bf2",
+    "model": "gpt-4o-mini-2024-07-18",
+    "event_types": [
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "goose_chat_empty_arguments/0.json": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "1",
+          "name": "example_fn",
+          "arguments": "{}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": null,
+    "model": null,
+    "event_types": [
+      "ToolCallReady"
+    ]
+  },
+  "goose_chat_length/0.json": {
+    "message": {
+      "role": "assistant",
+      "content": "Partial answer"
+    },
+    "token_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "length",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": null,
+    "model": null,
+    "event_types": [
+      "TextDelta"
+    ]
+  },
+  "goose_gemini_cached/0.json": {
+    "message": {
+      "role": "assistant"
+    },
+    "token_usage": {
+      "input_tokens": 100,
+      "output_tokens": 20,
+      "reasoning_tokens": 0,
+      "cached_tokens": 80,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": null,
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": null,
+    "model": null,
+    "event_types": [
+      "UsageDelta"
+    ]
+  },
+  "goose_gemini_signature/0.json": {
+    "message": {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "Let me think..."
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "call_77578e9134e949a8a11c2ee9c0ae3676",
+          "name": "shell",
+          "arguments": "{\"cmd\": \"ls\"}",
+          "metadata": {
+            "gemini_thought_signature": "thought_sig_abc"
+          }
+        },
+        {
+          "id": "call_59e5468d3c5b475b9f1a833a61684581",
+          "name": "read",
+          "arguments": "{}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": null,
+    "model": null,
+    "event_types": [
+      "ReasoningDelta",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "ToolCallDelta",
+      "ToolCallReady"
+    ]
+  },
+  "goose_gemini_signature/1.json": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_387bca7020e04002aa44f9910510bcbb",
+          "name": "echo",
+          "arguments": "{}",
+          "metadata": {
+            "gemini_thought_signature": "sig_456"
+          }
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": null,
+    "model": null,
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady"
+    ]
+  },
+  "goose_gemini_signature/2.json": {
+    "message": {
+      "role": "assistant",
+      "content": "Done!"
+    },
+    "token_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": null,
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": null,
+    "model": null,
+    "event_types": [
+      "TextDelta"
+    ]
+  },
+  "goose_gemini_thinking_usage/0.json": {
+    "message": {
+      "role": "assistant"
+    },
+    "token_usage": {
+      "input_tokens": 100,
+      "output_tokens": 250,
+      "reasoning_tokens": 200,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": null,
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": null,
+    "model": null,
+    "event_types": [
+      "UsageDelta"
+    ]
+  },
+  "goose_messages_cache_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "Hi"
+    },
+    "token_usage": {
+      "input_tokens": 15007,
+      "output_tokens": 25,
+      "reasoning_tokens": 0,
+      "cached_tokens": 5000,
+      "cache_write_tokens": 10000
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_1",
+    "model": "claude-opus-4-6",
+    "event_types": [
+      "UsageDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "goose_messages_cache_write/0.json": {
+    "message": {
+      "role": "assistant",
+      "content": "Hello! How can I assist you today?"
+    },
+    "token_usage": {
+      "input_tokens": 24,
+      "output_tokens": 15,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 12
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_123",
+    "model": "claude-sonnet-4-20250514",
+    "event_types": [
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "goose_messages_parallel_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "tool_a",
+          "name": "search",
+          "arguments": "{\"query\":\"rust\"}"
+        },
+        {
+          "id": "tool_b",
+          "name": "write",
+          "arguments": "{\"path\":\"/tmp/a.md\"}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 5,
+      "output_tokens": 20,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_par",
+    "model": "claude-opus-4-6",
+    "event_types": [
+      "UsageDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallDelta",
+      "ToolCallReady",
+      "ToolCallReady",
+      "UsageDelta"
+    ]
+  },
+  "goose_messages_redacted_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "provider_data",
+          "api_format": "messages",
+          "payload": {
+            "type": "redacted_thinking",
+            "data": "opaque_base64_data"
+          }
+        },
+        {
+          "type": "text",
+          "text": "Done."
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 5,
+      "output_tokens": 10,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_2",
+    "model": "claude-opus-4-6",
+    "event_types": [
+      "UsageDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "goose_messages_redacted_streaming/1.sse": {
+    "message": {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "provider_data",
+          "api_format": "messages",
+          "payload": {
+            "type": "redacted_thinking",
+            "data": "opaque_base64_data"
+          }
+        },
+        {
+          "type": "text",
+          "text": "Done."
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 5,
+      "output_tokens": 10,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_2",
+    "model": "claude-opus-4-6",
+    "event_types": [
+      "UsageDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "goose_messages_thinking_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "provider_data",
+          "api_format": "messages",
+          "payload": {
+            "type": "thinking",
+            "thinking": "Let me analyze this problem.",
+            "signature": "sig_abc123"
+          }
+        },
+        {
+          "type": "reasoning",
+          "text": "Let me analyze this problem."
+        },
+        {
+          "type": "text",
+          "text": "Here is the answer."
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 10,
+      "output_tokens": 25,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_1",
+    "model": "claude-opus-4-6",
+    "event_types": [
+      "UsageDelta",
+      "ReasoningDelta",
+      "ReasoningDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "goose_messages_thinking_streaming/1.sse": {
+    "message": {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "provider_data",
+          "api_format": "messages",
+          "payload": {
+            "type": "thinking",
+            "thinking": "Let me analyze this problem.",
+            "signature": "sig_abc123"
+          }
+        },
+        {
+          "type": "reasoning",
+          "text": "Let me analyze this problem."
+        },
+        {
+          "type": "text",
+          "text": "Here is the answer."
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 10,
+      "output_tokens": 25,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_1",
+    "model": "claude-opus-4-6",
+    "event_types": [
+      "UsageDelta",
+      "ReasoningDelta",
+      "ReasoningDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "goose_messages_unsigned_thinking/0.json": {
+    "message": {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "provider_data",
+          "api_format": "messages",
+          "payload": {
+            "type": "thinking",
+            "thinking": "internal reasoning"
+          }
+        },
+        {
+          "type": "reasoning",
+          "text": "internal reasoning"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 12,
+      "output_tokens": 15,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "msg_123",
+    "model": "glm-4.7",
+    "event_types": [
+      "ReasoningDelta",
+      "UsageDelta"
+    ]
+  },
+  "goose_responses_call_id/0.json": {
+    "message": {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_abc",
+          "name": "test__get_person_zip_code",
+          "arguments": "{\"name\":\"Alice Burns\"}"
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "tool_calls",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_1",
+    "model": "gpt-5.3-codex",
+    "event_types": [
+      "ToolCallDelta",
+      "ToolCallReady"
+    ]
+  },
+  "goose_responses_keepalive_streaming/0.sse": {
+    "message": {
+      "role": "assistant",
+      "content": "Hello world"
+    },
+    "token_usage": {
+      "input_tokens": 10,
+      "output_tokens": 4,
+      "reasoning_tokens": 0,
+      "cached_tokens": 6,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "stop",
+    "refusal": null,
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_1",
+    "model": "gpt-5.2-pro",
+    "event_types": [
+      "TextDelta",
+      "TextDelta",
+      "UsageDelta"
+    ]
+  },
+  "goose_responses_refusal/0.json": {
+    "message": {
+      "role": "assistant"
+    },
+    "token_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "finish_reason": "refusal",
+    "refusal": "I cannot help with that request.",
+    "citations": [],
+    "builtin_tool_calls": [],
+    "id": "resp_1",
+    "model": "gpt-5.5",
+    "event_types": [
+      "RefusalDelta"
+    ]
+  }
+}

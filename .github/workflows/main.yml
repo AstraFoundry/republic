@@ -47,7 +47,7 @@ jobs:
       - run: go build ./...
 
   go-parity:
-    name: Go / Python behavioral parity
+    name: Go behavioral compatibility
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -56,11 +56,8 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: stable
-      - uses: ./.github/actions/setup-python-env
-      - name: Compare requests and recorded responses
-        run: go test ./...
-        env:
-          REPUBLIC_PYTHON_PARITY: '1'
+      - name: Check original-behavior baselines and protocol recordings
+        run: make parity
       - name: Fuzz protocol parsers
         run: go test -run '^$' -fuzz '^FuzzStreamParser$' -fuzztime=10s
       - name: Fuzz message serialization
@@ -74,59 +71,19 @@ jobs:
 
       - uses: j178/prek-action@v1
 
-  tests-and-type-check:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12", "3.13", "3.14"]
-      fail-fast: false
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Check out
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Set up the environment
-        uses: ./.github/actions/setup-python-env
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Run tests
-        run: uv run python -m pytest tests
-
-      - name: Check typing
-        run: uv run ty check
-
   check-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: ./.github/actions/setup-python-env
+      - uses: ./.github/actions/setup-docs
       - name: Build documentation
-        run: uv run --frozen --group docs zensical build --clean --strict
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Set up the environment
-        uses: ./.github/actions/setup-python-env
-
-      - name: Build package
-        run: uv build
+        run: make docs-test
 
   landing-feedback:
     name: Landing review
-    needs: [go, go-parity, quality, tests-and-type-check, build, check-docs]
+    needs: [go, go-parity, quality, check-docs]
     if: >-
       always() && !cancelled() && vars.LANDING_MODEL != '' &&
       ((github.event_name == 'pull_request' && !github.event.pull_request.draft &&
@@ -144,7 +101,10 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: ./.github/actions/setup-python-env
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.9.21"
+          enable-cache: false
       - uses: actions/setup-go@v6
         with:
           go-version: stable
@@ -168,7 +128,7 @@ jobs:
           head: ${{ github.event.pull_request.head.sha || inputs.head || '' }}
           checked-revision: ${{ github.sha }}
           instruction: >-
-            Native checks: go=${{ needs.go.result }}, go-parity=${{ needs.go-parity.result }}, quality=${{ needs.quality.result }}, tests-and-type-check=${{ needs.tests-and-type-check.result }}, build=${{ needs.build.result }}, check-docs=${{ needs.check-docs.result }}.
+            Native checks: go=${{ needs.go.result }}, go-parity=${{ needs.go-parity.result }}, quality=${{ needs.quality.result }}, check-docs=${{ needs.check-docs.result }}.
             Ignore the Landing review job when assessing native check completion.
             Review affected user-visible behavior against repository guidance. Reuse these check results and relevant review history; investigate unresolved questions and publish useful findings or a brief clean verdict.
       - name: Report unsuccessful feedback

@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Options uses the portable option names from Republic's Python interface.
+// Options uses Republic's portable option names.
 // Presence matters: false and zero are sent when explicitly supplied.
 type Options map[string]any
 type OutputSchema struct {

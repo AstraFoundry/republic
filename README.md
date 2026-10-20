@@ -64,11 +64,11 @@ make parity
 make build
 ```
 
-Go is the runtime implementation and has no Python runtime dependency.
-`src/republic`, `tests`, `pyproject.toml` and `uv.lock` retain the original Python
-implementation and its tests as an executable migration oracle. `make parity`
-compares Go requests and responses against that implementation without provider
-keys or live inference requests. See [Contributing](CONTRIBUTING.md).
+The library, tests and compatibility checks require only Go. The original
+Python implementation and its tooling have been removed. `make parity` compares
+570 request cases and 58 recorded responses against frozen original-behavior
+baselines in `testdata`; it does not run a second implementation. See
+[Contributing](CONTRIBUTING.md) for development and optional documentation tools.
 
 ## License
 

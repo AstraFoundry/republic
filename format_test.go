@@ -4,20 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
-	"os/exec"
 	"reflect"
 	"testing"
 )
 
-func TestPythonRequestDifferential(t *testing.T) {
-	if os.Getenv("REPUBLIC_PYTHON_PARITY") != "1" {
-		t.Skip("set REPUBLIC_PYTHON_PARITY=1")
-	}
-	data, err := exec.Command("uv", "run", "python", "tests/go_request_oracle.py").Output()
+func TestRequestCompatibility(t *testing.T) {
+	data, err := os.ReadFile("testdata/compatibility/requests.json")
 	if err != nil {
-		if e, ok := err.(*exec.ExitError); ok {
-			t.Fatal(string(e.Stderr))
-		}
 		t.Fatal(err)
 	}
 	var cases map[string]struct {
@@ -37,6 +30,9 @@ func TestPythonRequestDifferential(t *testing.T) {
 	}
 	if err := json.Unmarshal(data, &cases); err != nil {
 		t.Fatal(err)
+	}
+	if len(cases) != 570 {
+		t.Fatalf("expected 570 request baselines, got %d", len(cases))
 	}
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -61,7 +57,7 @@ func TestPythonRequestDifferential(t *testing.T) {
 			got, err := (WireFormat{Format: c.Format, Dialect: c.Provider}).Build(ChatRequest{Model: "test-model", Messages: messages, Options: c.Options, OutputSchema: schema}, c.Stream)
 			if c.Error != "" {
 				if err == nil {
-					t.Fatalf("accepted request rejected by Python (%s)", c.Error)
+					t.Fatalf("accepted request rejected by the baseline (%s)", c.Error)
 				}
 				var apiError *Error
 				if c.Error == "UnsupportedFeatureError" && (!errors.As(err, &apiError) || apiError.Kind != ErrUnsupportedFeature) {
@@ -85,7 +81,7 @@ func TestPythonRequestDifferential(t *testing.T) {
 			}
 			if !reflect.DeepEqual(canonical, c.Body) {
 				want, _ := json.Marshal(c.Body)
-				t.Errorf("Go: %s\nPython: %s", b, want)
+				t.Errorf("Actual: %s\nBaseline: %s", b, want)
 			}
 		})
 	}
