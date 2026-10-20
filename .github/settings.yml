@@ -1,8 +1,8 @@
 repository:
   default_branch: main
-  description: "A Python library for AI providers."
+  description: "A Go library for AI providers."
   homepage: "https://getrepublic.org"
   topics:
     - ai
     - ai-provider
-    - python
+    - go

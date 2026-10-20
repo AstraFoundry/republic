@@ -54,7 +54,10 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
           persist-credentials: false
-      - uses: ./.github/actions/setup-python-env
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.9.21"
+          enable-cache: false
       - uses: actions/setup-go@v6
         with:
           go-version: stable
@@ -113,7 +116,7 @@ jobs:
           checked-revision: ${{ github.event_name != 'workflow_run' && github.sha || '' }}
           delivery-key: ${{ github.event_name != 'workflow_run' && format('duty:{0}', github.run_id) || '' }}
           instruction: >-
-            Maintain dependencies with uv under project version policy, scoped to the supplied candidate or alert.
+            Maintain Go module dependencies with go mod under project version policy, scoped to the supplied candidate or alert.
             Reuse matching candidates; publish new draft PRs on deps/landing-* branches or repair the supplied PR's existing branch after current CI failure.
             Follow AGENTS.md for validation and dispatch main.yml with the PR number and full candidate head SHA; do not wait for Landing review.
             You may maintain necessary tracking issues. Maintainers decide merge and alert dismissal.

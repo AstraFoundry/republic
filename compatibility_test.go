@@ -3,7 +3,6 @@ package republic
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -95,18 +94,11 @@ func canonicalResponse(t *testing.T, r Response) any {
 	return v
 }
 
-// Python is used only when this explicit differential-test switch is enabled.
-// Ordinary Go tests and the Go library have no Python runtime dependency.
-func TestPythonDifferential(t *testing.T) {
-	if os.Getenv("REPUBLIC_PYTHON_PARITY") != "1" {
-		t.Skip("set REPUBLIC_PYTHON_PARITY=1 to compare with the Python oracle")
-	}
-	cmd := exec.Command("uv", "run", "python", "tests/go_oracle.py")
-	data, err := cmd.Output()
+// Baselines were captured from the original implementation before its removal.
+// Compatibility checks always run and need only the Go toolchain.
+func TestResponseCompatibility(t *testing.T) {
+	data, err := os.ReadFile("testdata/compatibility/responses.json")
 	if err != nil {
-		if e, ok := err.(*exec.ExitError); ok {
-			t.Fatal(string(e.Stderr))
-		}
 		t.Fatal(err)
 	}
 	var expected map[string]struct {
@@ -116,33 +108,33 @@ func TestPythonDifferential(t *testing.T) {
 	if err := json.Unmarshal(data, &expected); err != nil {
 		t.Fatal(err)
 	}
-	if len(expected) < 50 {
-		t.Fatalf("oracle only returned %d recordings", len(expected))
+	if len(expected) != 58 {
+		t.Fatalf("expected 58 response baselines, got %d", len(expected))
 	}
 	names := map[string]string{"text_delta": "TextDelta", "reasoning_delta": "ReasoningDelta", "refusal_delta": "RefusalDelta", "tool_call_delta": "ToolCallDelta", "tool_call_ready": "ToolCallReady", "usage_delta": "UsageDelta", "image_ready": "ImageReady", "citation_added": "CitationAdded", "builtin_tool_call_ready": "BuiltinToolCallReady"}
 	for path, want := range expected {
 		t.Run(path, func(t *testing.T) {
 			format := strings.Split(path, "_")[1]
-			got, events := recordedResponse(t, filepath.Join("tests", "test_provider_golden", "cases", path), format)
+			got, events := recordedResponse(t, filepath.Join("testdata", "protocol", "cases", path), format)
 			a, b := canonicalResponse(t, got), canonicalResponse(t, want.Response)
 			if !reflect.DeepEqual(a, b) {
 				ga, _ := json.MarshalIndent(a, "", "  ")
 				wb, _ := json.MarshalIndent(b, "", "  ")
-				t.Errorf("Go:\n%s\nPython:\n%s", ga, wb)
+				t.Errorf("Actual:\n%s\nBaseline:\n%s", ga, wb)
 			}
 			types := []string{}
 			for _, e := range events {
 				types = append(types, names[e.Type])
 			}
 			if len(types) != len(want.EventTypes) || strings.Join(types, ",") != strings.Join(want.EventTypes, ",") {
-				t.Errorf("event sequence:\nGo %v\nPython %v", types, want.EventTypes)
+				t.Errorf("event sequence:\nActual %v\nBaseline %v", types, want.EventTypes)
 			}
 		})
 	}
 }
 
 func TestRecordedProtocols(t *testing.T) {
-	paths, err := filepath.Glob("tests/test_provider_golden/cases/*/*")
+	paths, err := filepath.Glob("testdata/protocol/cases/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -201,7 +193,7 @@ func TestRecordedProtocols(t *testing.T) {
 			}
 		})
 	}
-	if count < 50 {
-		t.Fatalf("only %d recordings", count)
+	if count != 58 {
+		t.Fatalf("expected 58 recordings, got %d", count)
 	}
 }

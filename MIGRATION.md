@@ -1,8 +1,9 @@
 # Go migration
 
-The Go implementation must preserve the Python library's observable provider
-behavior. Python sources and tests remain as an executable compatibility oracle
-during migration. Go must not invoke Python at runtime.
+Republic now contains the Go implementation and Go tests. The original Python
+library, tests, examples, packaging and dependency configuration have been removed.
+Compatibility checks use frozen original-behavior data; neither the library nor
+the tests start Python.
 
 ## Acceptance checklist
 
@@ -14,7 +15,7 @@ during migration. Go must not invoke Python at runtime.
 - [x] HTTP errors, request IDs, retries, cancellation and resource lifecycle.
 - [x] Extensions and custom provider/format hooks.
 - [x] Structured output and schema adaptation.
-- [x] Differential tests against Python and existing recorded protocol fixtures.
+- [x] Go compatibility tests against frozen original-behavior data and protocol fixtures.
 - [x] Go race tests, fuzz seeds, coverage, static checks, CI and examples.
 - [x] Migration documentation.
 
@@ -25,10 +26,11 @@ Provider-side tool execution remains outside this package.
 
 ## Compatibility boundary
 
-The Go module is independent of Python. The original Python runtime sources are
-unchanged and remain under `src/republic` solely as a reference implementation.
-Original Python tests and provider recording licenses remain intact. Go callers
-install the root module; they do not need uv, Python, HTTPX or Pydantic.
+The Go module and its tests require only Go. Before removing the original source,
+its request and response results were exported into `testdata/compatibility`.
+The raw protocol recordings and their original licenses remain in
+`testdata/protocol`. Baseline provenance and maintenance rules are documented
+alongside the data; changing Go behavior cannot silently rewrite expectations.
 
 Names and ownership follow Go conventions:
 
@@ -53,17 +55,19 @@ uniqueness and identity rather than compared to another run's random IDs.
 
 ## Verification
 
-- 608 live differential request cases compare all four chat protocols, compatible
+- 570 frozen request cases cover all four chat protocols, compatible
   provider dialects, tools, built-ins, schema mapping, option rejection, and streaming.
-- All 58 existing JSON/SSE recordings are parsed by both implementations. Tests
-  compare messages, tool arguments and metadata, token usage, finish reasons,
+- All 58 existing JSON/SSE recordings are parsed by Go and checked against
+  captured original responses. Tests compare messages, tool arguments and
+  metadata, token usage, finish reasons,
   citations, built-in calls, IDs/models and the emitted event-type sequence.
 - Native tests cover HTTP retries, body-read failures, cancellation, stream
   truncation/early exit, history isolation, client ownership, provider registration,
   auxiliary models, pagination, schema validation, OAuth refresh/persistence,
   cross-instance file locks, PKCE/device login and Copilot stream repairs.
-- The original 553 Python behavior tests still pass without changes to the Python
-  implementation or its original test assertions.
+- Before removing the original source, all 553 original Python tests passed.
+  They are not part of the current repository or CI. Earlier migration reports
+  incorrectly counted 608 request cases; the exported corpus contains 570.
 - Race testing, Go vet/build, Go 1.23 testing, Linux/Windows cross-compilation and
   strict documentation builds are part of local verification. CI additionally
   executes Go tests on Linux, macOS and Windows.
