@@ -1,34 +1,21 @@
-# Google Gemini API
+# google
 
-Use the `google` provider to call the Gemini API with an API key. It supports chat through the Gemini format, embeddings through the Embed Content format, and images through the Gemini Image format.
+Default API base: `https://generativelanguage.googleapis.com/v1beta`.
+Supported formats, in preference order: `gemini`, `embed_content`, `gemini_image`.
 
-## Get started
-
-Install Republic using the [quickstart](../quickstart.md#install-republic), set `REPUBLIC_GOOGLE_API_KEY`, and replace `MODEL_ID` with a model available to your account:
-
-```python
-import asyncio
-
-import republic
-
-
-async def main():
-    model = republic.get_model("google:MODEL_ID")
-    response = await model.chat("Say hello in one sentence.")
-    print(response.text)
-
-
-asyncio.run(main())
+```go
+model, err := republic.GetModel("google:MODEL_ID", republic.ProviderConfig{})
+if err != nil { return err }
+defer model.Close()
 ```
 
-## Authentication
+The `gemini` provider alias also works and reads `REPUBLIC_GEMINI_*` variables. API keys use `x-goog-api-key`. Gemini 3 reasoning uses thinking levels; use extra_body or a custom format for older thinking-budget models. Tool-result media must be inline. Thought signatures are retained.
 
-Republic reads `REPUBLIC_GOOGLE_API_KEY` when the provider is created and sends the key in the `x-goog-api-key` header. You can pass a key loaded by your application as `api_key=`; see [API-key authentication](../guides/authentication.md#use-an-api-key).
+API keys and base URLs can be provided through `ProviderConfig` or
+`REPUBLIC_GOOGLE_API_KEY` and
+`REPUBLIC_GOOGLE_API_BASE`. `EnvPrefix` changes the prefix.
+An explicitly selected APIFormat only affects models of the same kind;
+embedding, image and decision models still select their supported format.
 
-## Model support
-
-Use `chat()` for a complete response or `stream()` for events. For an embedding model, use `get_embedding_model("google:MODEL_ID")`, then await `embed(text)` or `embed_many(texts)` inside an async function.
-
-For an image model, use `get_image_model("google:MODEL_ID")`, then await `generate(prompt)` or `edit(prompt, images)`. The `gemini_image` format calls `generateContent` and asks only for image output. Set `aspect_ratio=` (such as `"16:9"`) and `size=` (`"1K"`, `"2K"`, or `"4K"`) to shape the image. Masks and the OpenAI-only options `quality`, `background`, `output_format`, `output_compression`, and `moderation` raise `errors.UnsupportedFeatureError`. A reply without images, such as one stopped by a safety filter, raises `errors.APIResponseError`. See [image models](../reference/provider-api.md#image-models).
-
-Choose a model that supports the requested operation and inputs. See [configuration](../reference/configuration.md) for endpoint overrides and request options.
+See [authentication](../guides/authentication.md) and
+[configuration](../reference/configuration.md).

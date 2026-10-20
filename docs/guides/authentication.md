@@ -1,84 +1,48 @@
-# API keys and account authentication
+# Authentication
 
-Use an API key, reuse an existing CLI login, or authorize an account explicitly. Authentication is a provider option: set `api_key=` or `auth=` when creating a model, then use its normal request methods.
+Keys default to `REPUBLIC_<PROVIDER>_API_KEY`. An explicit `ProviderConfig.Auth`
+overrides APIKey; APIKey overrides the environment. Headers are signed on each
+attempt so refreshable credentials can rotate between retries.
 
-The [provider directory](../providers/index.md) lists supported services and their default credential sources. Install Republic using the [quickstart](../quickstart.md#install-republic).
-
-## Use an API key
-
-Set the provider's environment variable before creating a model, or pass a key your application has already loaded. Replace `MODEL_ID` with a model available to your account:
-
-```python
-import os
-
-import republic
-
-model = republic.get_model("openai:MODEL_ID", api_key=os.environ["MY_APP_API_KEY"])
+```go
+provider, err := republic.GetProvider("anthropic", republic.ProviderConfig{
+    APIKey: "your-key",
+})
+if err != nil { return err }
+defer provider.Close()
 ```
 
-API-key setup is available for [OpenAI](../providers/openai.md), [Anthropic](../providers/anthropic.md), [Google Gemini](../providers/google.md), [OpenRouter](../providers/openrouter.md), [Grok](../providers/grok.md#use-an-api-key), and [TypeSafe](../providers/typesafe.md).
+For custom authentication implement `Auth.Apply(context.Context, *http.Request)`
+or use AuthFunc, HeaderAuth or OAuth2Auth. Bearer-token persistence belongs to the
+caller unless a file-backed credential helper was explicitly selected.
 
-## Reuse a CLI login
+## CLI credentials
 
-| Existing login | Provider | Default source |
-| --- | --- | --- |
-| [Codex ChatGPT login](../providers/codex.md) | `codex` | Codex credential file |
-| [GitHub CLI login](../providers/github-copilot.md) | `github-copilot` | `gh auth token` |
-| [Grok CLI login](../providers/grok.md) | `grok` | Grok credential file |
+- `CodexAuthFromFile(path)` reads `$CODEX_HOME/auth.json` when path is empty.
+  Access tokens refresh when expiry metadata says they are near expiry. Opaque
+  tokens without expiry are sent unchanged. Account IDs are sent separately.
+- `GrokAuthFromFile(path)` honors GROK_AUTH_PATH and GROK_HOME. Refreshes acquire
+  the CLI-compatible OS lock and reread the file under the lock.
+- `GitHubCLIAuth` reads `gh auth token --hostname HOST` for each request. It does
+  not copy the GitHub CLI credential store.
 
-For example, with an existing Codex file login:
+Codex and Grok file helpers preserve unrelated JSON fields and atomically replace
+credential files with private permissions. Token() returns a snapshot for
+caller-managed persistence when credentials were created in memory.
 
-```python
-import republic
+## Explicit login
 
-model = republic.get_model("codex:MODEL_ID")
-```
+`LoginCodex`, `LoginGrok` and `LoginGitHubCLI` run the official CLI in the caller's
+terminal. They accept a context and optional executable path. Login is never
+started automatically by an inference request.
 
-To select another Codex file, pass `auth=CodexAuth.from_file(path)`, importing the class from `republic.providers`. [Configuration](../reference/configuration.md) describes credential precedence and read timing.
+`LoginCopilot(ctx, callback)` uses GitHub's plugin device flow. The callback receives
+the verification URL and user code; nil prints them to stderr. Persist the returned
+GitHubToken() yourself. NewCopilotAuth restores it. Exchanges use the inference
+client's transport and follow the validated HTTPS API origin returned by GitHub.
 
-## Authorize an account
+`LoginOpenRouter(ctx, callback)` supplies a PKCE authorization URL and expects an
+authorization code. Save APIKey from the returned OpenRouterAuth yourself.
 
-Call `.login()` explicitly when you need a new authorization, then pass the returned object as `auth=`. Auth classes are exported from `republic.providers`.
-
-| Service | Login helper | Authorization interface |
-| --- | --- | --- |
-| [Codex](../providers/codex.md#log-in-explicitly) | `CodexAuth.login()` | Codex CLI; optional device authorization |
-| [Grok](../providers/grok.md#log-in-explicitly) | `GrokAuth.login()` | Grok CLI; optional device authorization |
-| [GitHub CLI](../providers/github-copilot.md#log-in-with-github-cli) | `GitHubCLIAuth.login()` | GitHub CLI |
-| [Copilot Plugin](../providers/github-copilot.md#authorize-the-copilot-plugin) | `CopilotAuth.login()` | GitHub device authorization; optional display callback |
-| [OpenRouter](../providers/openrouter.md#authorize-with-oauth-pkce) | `OpenRouterAuth.login(on_authorize=...)` | Caller displays the authorization URL and returns the copied code |
-
-Normal model requests reuse credentials without starting an interactive login. Account authorization and model access are separate: the service determines which models your account can use.
-
-## Store and refresh credentials
-
-Reuse auth objects across requests. Storage and renewal depend on how you obtained the credential:
-
-| Credential source | Storage | Renewal |
-| --- | --- | --- |
-| API key | Your application | Replace the key when needed |
-| OpenRouter PKCE login | Your application saves `auth.api_key` | Returns an API key; requests do not refresh it |
-| Codex file login | CLI credential file; Republic saves refreshed tokens there | Republic refreshes tokens when a refresh token is available |
-| `CodexAuth(token, account_id=...)` | Your application saves the updated `auth.token` | Republic refreshes tokens when a refresh token is available |
-| Grok file login | CLI credential file; Republic saves refreshed tokens there under the CLI lock | Republic refreshes expiring tokens using the refresh token |
-| `GrokAuth(token)` | Your application saves the updated `auth.token` | Republic refreshes expiring tokens using the refresh token |
-| GitHub CLI login | GitHub CLI | Republic reads `gh auth token` for each request |
-| Copilot Plugin login | Your application saves `auth.github_token` | Republic renews the exchanged inference token; your application manages the original GitHub credential |
-
-Restore an OpenRouter key with `OpenRouterAuth(saved_key)` or a Plugin credential with `CopilotAuth(saved_token)`. The provider pages contain login examples and service-specific credential paths.
-
-## Supply an auth object
-
-`auth=` accepts the standard `httpx2.Auth` interface, also exported as `republic.auth.Auth`. A fixed bearer credential can use `HeaderAuth`:
-
-```python
-import os
-
-from republic import get_model
-from republic.auth import HeaderAuth
-
-auth = HeaderAuth("Authorization", f"Bearer {os.environ['MY_APP_API_KEY']}")
-model = get_model("openai:MODEL_ID", auth=auth)
-```
-
-Explicit `auth=` takes precedence over API-key authentication. `republic.auth` also exports Authlib's `OAuth2Auth`; provider-specific classes handle their own refresh and exchange rules. See [configuration](../reference/configuration.md) for the full precedence order.
+When supplying an HTTP client whose RoundTripper handles authentication, also set
+Auth explicitly (a no-op AuthFunc is sufficient) to suppress CLI credential lookup.

@@ -1,56 +1,21 @@
-# Codex with ChatGPT login
+# codex
 
-Use the `codex` provider with a Codex ChatGPT account login. Chat and streaming use the Responses endpoint.
+Default API base: `https://chatgpt.com/backend-api/codex`.
+Supported formats, in preference order: `responses`.
 
-## Get started
-
-Install Republic using the [quickstart](../quickstart.md#install-republic). With an existing Codex file login, replace `MODEL_ID` with a model available to your account and run:
-
-```python
-import asyncio
-
-import republic
-
-
-async def main():
-    model = republic.get_model("codex:MODEL_ID")
-    response = await model.chat("Say hello in one sentence.")
-    print(response.text)
-
-
-asyncio.run(main())
+```go
+model, err := republic.GetModel("codex:MODEL_ID", republic.ProviderConfig{})
+if err != nil { return err }
+defer model.Close()
 ```
 
-## Authentication
+Uses Codex OAuth credentials from `$CODEX_HOME/auth.json` by default. Both Chat and Stream use the streaming Responses endpoint. Requests force `store: false`, include encrypted reasoning, and default instructions to `You are Codex.`. `max_tokens` and model listing are unsupported.
 
-### Use an existing login
+API keys and base URLs can be provided through `ProviderConfig` or
+`REPUBLIC_CODEX_API_KEY` and
+`REPUBLIC_CODEX_API_BASE`. `EnvPrefix` changes the prefix.
+An explicitly selected APIFormat only affects models of the same kind;
+embedding, image and decision models still select their supported format.
 
-The default credential file is `$CODEX_HOME/auth.json`, or `~/.codex/auth.json` when `CODEX_HOME` is unset. Credentials must be available in that file; a CLI login stored only in the keyring cannot be read through this path.
-
-To choose another file, replace the model construction with `get_model(..., auth=CodexAuth.from_file(path))`. Import `CodexAuth` from `republic.providers`.
-
-### Log in explicitly
-
-Inside an async function, obtain an auth object and pass it to the model:
-
-```python
-import republic
-from republic.providers import CodexAuth
-
-auth = await CodexAuth.login()
-model = republic.get_model("codex:MODEL_ID", auth=auth)
-```
-
-This runs the installed Codex CLI and selects file storage for this invocation. Use `device_auth=True` for device authorization or `executable=` to select the CLI executable. Model requests do not start this login flow themselves.
-
-### Store and refresh credentials
-
-`CodexAuth.from_file()` reads the file immediately and before every request. Expiring tokens are refreshed when a refresh token is available, then saved to the same file.
-
-For application-managed credentials, use `CodexAuth(token, account_id=...)`. Reuse the auth object across requests and persist its updated `auth.token` in your own credential store.
-
-## Model support
-
-Use `chat()` for a complete response or `stream()` for events. Responses is the only supported format; `max_tokens` is unsupported. Model access depends on your ChatGPT account.
-
-For OpenAI API-key access, use the [OpenAI provider](openai.md). See [configuration](../reference/configuration.md) for credential precedence and HTTP clients.
+See [authentication](../guides/authentication.md) and
+[configuration](../reference/configuration.md).

@@ -1,404 +1,77 @@
-# Provider API specification
-
-## API overview
-
-Examples containing `await` run inside an async function. Choose models available to your account; capabilities depend on the provider, model, and API format.
-
-### Basic usage
-
-```python
-import republic
-from republic.events import TextDelta
-
-model = republic.get_model("openai:gpt-6-sol")
-
-# Chat
-response = await model.chat("Hello, how are you?")
-print(response.text)
-
-# Stream
-async with model.stream("Hello, how are you?") as stream:
-    async for event in stream:
-        if isinstance(event, TextDelta):
-            print(event.chunk)
-print(stream.response.text)
-```
-
-Consume the stream before reading its final response or shortcuts such as `stream.output`. Reading them early raises `errors.StreamNotFinishedError`.
-
-A clean EOF alone does not complete a stream. Chat Completions requires `[DONE]`; Responses requires `response.completed`, `response.incomplete`, or the `[DONE]` marker used by compatible services; Messages requires `message_stop` (Copilot also accepts `[DONE]`); Gemini requires a candidate's `finishReason`. A provider-reported output limit or paused turn is a terminal result, not a transport truncation.
-
-If the stream ends without its completion signal, Republic raises `errors.StreamIncompleteError`, emits no `Completed` event and writes no conversation history. Any partial events already yielded remain available to the caller, but `stream.response` stays unavailable. Transport failures and provider error events also leave history unchanged. Custom `StreamParser` implementations must set `self.completed = True` on their terminal event, or override `finish()` to validate completion according to their protocol.
-
-### Initialization
-
-```python
-# Use the API key and base URL from REPUBLIC_OPENAI_* environment variables.
-model = republic.get_model("openai:gpt-6-sol")
-
-# Change the environment variable prefix.
-provider = republic.get_provider("openai", env_prefix="MY_CUSTOM_PREFIX")
-model = provider.get_model("gpt-6-sol")
-
-# Pass an API key and base URL loaded by the application.
-model = republic.get_model("openai:gpt-6-sol", api_base=api_base, api_key=api_key)
-
-# Pass an application-defined HTTPX2-compatible auth object.
-model = republic.get_model("openai:gpt-6-sol", auth=MyAuth())
-
-# Use a provider instance.
-provider = republic.get_provider("openai", api_key=api_key)
-model = provider.get_model("gpt-6-sol")
-```
-
-Here, `api_base`, `api_key`, and `MyAuth` are supplied by the application. A top-level constructor accepts `provider:model`; a provider instance accepts only the model name. See [configuration](configuration.md) for options and credential precedence, and [authentication](../guides/authentication.md) for API keys and account logins.
-
-### HTTP client lifecycle
-
-A Provider lazily creates one HTTP client and reuses it for requests, streams, model listing, and every model created by that Provider. Separate calls to the top-level model factories create separate Providers.
-
-For applications that manage a long-lived Provider, call `await provider.close()` at shutdown:
-
-```python
-provider = republic.get_provider("openai")
-model = provider.get_model("gpt-6-sol")
-try:
-    response = await model.chat("Hello")
-finally:
-    await provider.close()
-```
-
-Providers also support async context management. Context entries are released on exit, including when the body raises an exception or is cancelled:
-
-```python
-async with republic.get_provider("openai") as provider:
-    first = provider.get_model("gpt-6-sol")
-    second = provider.get_model("gpt-6-luna")
-    await first.chat("Hello")
-    await second.chat("Hello")
-```
-
-Chat, embedding, image, and decision models support the same pattern. The Provider tracks entered Provider and model contexts and closes only when all of them have exited:
-
-```python
-async with republic.get_model("openai:gpt-6-sol") as model:
-    response = await model.chat("Hello")
-```
-
-Use the same pattern with `get_embedding_model()`, `get_image_model()`, and `get_decision_model()`, or enter an existing model with `async with model:`. Entering a Provider or model does not create the HTTP client before its first request. Creating a model without entering its context does not register it as open. Nested contexts for the same model remain open until all its entries have exited.
-
-```python
-provider = republic.get_provider("openai")
-async with provider.get_model("gpt-6-sol") as first:
-    async with provider.get_embedding_model("text-embedding-3-small") as embeddings:
-        vector = await embeddings.embed("Hello")
-    # The Provider remains open while first's context is active.
-    response = await first.chat("Hello")
-# The last model context has exited, so the Provider is now closed.
-```
-
-A Provider context keeps the client open while model contexts enter and exit, so sequential model contexts can share it:
-
-```python
-async with republic.get_provider("openai") as provider:
-    for name in ["gpt-6-sol", "gpt-6-luna"]:
-        async with provider.get_model(name) as model:
-            response = await model.chat("Hello")
-    # The Provider context still keeps the client open here.
-```
-
-Nested Provider contexts follow the same rule: exiting an inner context does not close the client while another Provider or model context is active. Explicit `await provider.close()` closes it immediately, regardless of open contexts.
-
-`provider.close()` is idempotent; `provider.is_closed` reports whether it has been closed. Once closed, all models sharing that Provider reject further requests, and the Provider cannot be reopened. Finish outstanding requests and exit stream contexts before closing it. Exiting a stream context closes only that response and keeps the HTTP client available for subsequent requests.
-
-An internally created client must be used and closed on the event loop that first used it. Constructing the Provider outside an event loop is supported; reusing an active Provider across multiple `asyncio.run()` calls raises `RuntimeError`.
-
-An external client passed through `http_client=` remains caller-owned: closing the Provider leaves that client open. See [HTTP client configuration](configuration.md#http-clients) for transport settings.
-
-### Tool calls
-
-`tool1` and `tool2` below are `republic.Tool` schemas.
-
-```python
-response = await model.chat("Hello, how are you?", tools=[tool1, tool2])
-print(response.tool_calls)
-```
-
-Each call has an ID, name, raw JSON `arguments`, decoded `args`, and provider metadata. Preserve the call when returning its result.
-
-### Structured input
-
-```python
-response = await model.chat([
-    republic.system("You are a helpful assistant."),
-    republic.user("Hello, how are you?"),
-])
-print(response.text)
-```
-
-### Multimodal content
-
-User messages accept text and `Image`, `Audio`, and `Video` parts. The public content shape is independent of the selected provider:
-
-| Part | Constructor | Source fields |
-| --- | --- | --- |
-| `Image` | `republic.image(source, media_type=...)` | `media_type`, `data` or `url` |
-| `Audio` | `republic.audio(source, media_type=...)` | `media_type`, `data` or `url` |
-| `Video` | `republic.video(source, media_type=...)` | `media_type`, `data` or `url` |
-
-`media_type` is a MIME type such as `audio/mpeg`, rather than a protocol's format label such as `mp3`. `data` holds raw bytes; `url` holds a remote reference. The loader helpers handle sources consistently:
-
-- A local path or `Path` loads bytes and infers the MIME type from the filename unless `media_type=` is supplied.
-- An HTTP(S) or `gs://` URL keeps a reference without downloading it. MIME inference uses the URL path; query strings do not change its type. Supply `media_type=` for URLs without a recognizable filename.
-- A base64 data URL decodes bytes and uses the MIME type declared in that URL.
-- Raw bytes require an explicit `media_type=`.
-
-Use the parts directly in a user message. Each API format owns its wire encoding:
-
-```python
-model = republic.get_model("google:MODEL_ID")
-response = await model.chat(
-    republic.user(
-        "Describe these inputs.",
-        republic.image("path/to/image.png"),
-        republic.audio("path/to/audio.wav"),
-        republic.video("path/to/video.mp4"),
-    )
-)
-print(response.text)
-```
-
-The same message works with `model.stream()`. The following table describes Republic's input encoders; the chosen service and model must also support that input.
-
-| API format | Images | Audio | Video |
-| --- | --- | --- | --- |
-| Chat Completions | Data or URL | Inline WAV or MP3 | Data or URL, when the service supports `video_url` |
-| Responses | Data or URL | Rejected | Rejected |
-| Messages | Data or URL | Rejected | Rejected |
-| Gemini | Inline data or file reference | Inline data or file reference | Inline data or file reference |
-
-Provider dialects may extend a format. For example, OpenRouter's Chat Completions encoder also maps OGG, FLAC, and its other supported MIME types to their protocol format labels. Custom Chat Completions dialects can override `audio_content()` or extend `AUDIO_FORMATS`. Application code still passes the same `Audio` part.
-
-Unsupported audio combinations raise `errors.UnsupportedFeatureError` before sending a request. Republic does not transcode audio or fetch remote references to make them inline.
-
-After executing tool calls from a response, return the results with the full assistant message. Here, `results` contains `republic.tool(call, output)` messages created by the application:
-
-```python
-answer = await model.chat([
-    "Hello, how are you?",
-    response.message,
-    *results,
-])
-print(answer.text)
-```
-
-`response.message` preserves tool IDs and opaque provider state. See [tool round trips](../guides/tools.md) for a complete example.
-
-### Structured output
-
-Pass a Pydantic model or another type Pydantic can validate as `output_schema`. `MyOutputSchema` below is defined by the application:
-
-```python
-response = await model.chat("Hello, how are you?", output_schema=MyOutputSchema)
-print(response.output)
-
-async with model.stream("Hello, how are you?", output_schema=MyOutputSchema) as stream:
-    async for event in stream:
-        if isinstance(event, TextDelta):
-            print(event.chunk)
-print(stream.output)
-```
-
-The completed result is validated from the response's JSON text. A refusal leaves `output` as `None`; invalid output raises a Pydantic validation error. See [structured output](../guides/structured-output.md).
-
-### Image output
-
-Request image generation using a provider-run tool and a model that supports it:
-
-```python
-model = republic.get_model("openai:gpt-6-sol")
-response = await model.chat("Generate an image of a tree.", tools=[republic.tools.ImageGeneration()])
-print(response.text)
-print(response.image_parts)
-```
-
-`response.image_parts` contains `republic.Image` values. With `republic[image]` installed, `response.images` decodes inline image data into Pillow images. The response API has no video-output accessor.
-
-### Token usage
-
-```python
-response = await model.chat("Hello, how are you?")
-print(response.token_usage)
-print(response.token_usage.total_tokens)
-```
-
-Total tokens are input plus output tokens. Reasoning tokens are included in output; cached and cache-write tokens are included in input when reported.
-
-## Providers
-
-### Built-in providers
-
-The registered names are `openai`, `anthropic`, `google`, `openrouter`, `typesafe`, `codex`, `github-copilot`, `grok`, `azure-openai`, `ollama`, `deepseek`, `moonshot`, `zai`, `together`, `mistral`, `minimax`, and `magpie`. `republic.all_providers()` returns every registered name, including custom providers, sorted. See [supported providers](../providers/index.md) for model kinds, formats, and authentication paths.
-
-### Listing models
-
-```python
-provider = republic.get_provider("openai")
-for model in await provider.list_models():
-    print(model.id, model.display_name)
-```
-
-`list_models()` returns `republic.ModelInfo` values for every page of the service's model list. Pass `model.id` to `get_model()` or another model getter; `model.raw` keeps the service's entry, such as context length or pricing. Codex has no model list and raises `errors.UnsupportedFeatureError`.
-
-A custom provider sets `MODELS_PATH` relative to `api_base`, or `None` when the service has no list. Override `_parse_models()` for another response shape and `_models_params()` for pagination.
-
-### Custom providers
-
-Subclass a provider and register a unique name. Set the endpoint and formats to match the service:
-
-```python
-from republic.providers import OpenAI
-
-
-class MyCustomProvider(OpenAI):
-    DEFAULT_API_BASE = "https://api.example.com/v1"
-    SUPPORTED_API_FORMATS = ("responses", "messages", "chat")
-
-
-republic.register_provider(MyCustomProvider, "custom")
-model = republic.get_model("custom:gpt-6-sol")
-```
-
-### Service dialects
-
-Services that speak a known format with their own fields plug in through format hooks. Subclass a format from `republic.formats` and set it as `CHAT_FORMAT` on an `OpenAICompatible` subclass, or return it from `Provider.select_api_format()`, which also receives the model name:
-
-```python
-from republic.formats import ChatFormat
-from republic.providers import OpenAICompatible
-
-
-class AcmeChat(ChatFormat):
-    def reasoning_fields(self, effort, *, include_reasoning):
-        return {"thinking": {"type": "disabled" if effort == "none" else "enabled"}} if effort else {}
-
-
-class Acme(OpenAICompatible):
-    name = "acme"
-    DEFAULT_API_BASE = "https://api.acme.example/v1"
-    CHAT_FORMAT = AcmeChat()
-
-
-republic.register_provider(Acme)
-```
-
-Every chat format has `reasoning_fields()`. `ChatFormat` also has `max_tokens_fields()`, `reasoning_text()`, `content_text()` for answer text in content parts, and `assistant_fields()` for fields added to assistant messages sent back, such as `reasoning_content`.
-
-## API format support
-
-Republic selects the first format of the requested model kind in the provider's `SUPPORTED_API_FORMATS`. An explicit `api_format=` takes precedence for formats of that kind. Each built-in provider's default is the first chat format in the [provider directory](../providers/index.md).
-
-Use `api_format=` to select a supported format explicitly:
-
-```python
-model = republic.get_model("openai:gpt-6-sol", api_format="chat")
-
-provider = republic.get_provider("openai", api_format="chat")
-model = provider.get_model("gpt-6-sol")
-```
-
-A format not supported by the provider, such as `messages` for OpenAI, raises `errors.UnsupportedApiFormatError`. A preferred chat format does not prevent selecting an embedding, image, or decision format for another model kind.
-
-## Optional conversation history
-
-```python
-from republic.history import InMemoryHistory
-
-model = republic.get_model("openai:gpt-6-sol", history=InMemoryHistory(max_entries=10))
-response = await model.chat("Hello, how are you?")
-print(response.text)
-response = await model.chat("How about you?")
-print(response.text)
-```
-
-History follows this protocol, exported from `republic.history`:
-
-```python
-from typing import Protocol
-
-from republic import Message
-
-
-class HistoryProtocol(Protocol):
-    async def read(self) -> list[Message]:
-        """Read the conversation history."""
-        ...
-
-    async def write(self, messages: list[Message]) -> None:
-        """Append messages to the conversation history."""
-        ...
-```
-
-With attached history, Republic reads earlier messages before each request and appends the new input and assistant response after completion. Without it, the caller supplies conversation history.
-
-## Non-chat models
-
-### Embedding models
-
-Embedding models return vectors:
-
-```python
-model = republic.get_embedding_model("openai:embedding-model")
-response = await model.embed("Hello, how are you?")
-print(response.vector)
-```
-
-`embed_many(texts)` returns one vector per input in `response.vectors`. Replace `embedding-model` with an available embedding model.
-
-### Image models
-
-Image models generate and edit images:
-
-```python
-model = republic.get_image_model("openai:image-model")
-response = await model.generate("A watercolor fox in the snow", size="1024x1024", quality="high")
-response.images[0].save("fox.png")
-
-response = await model.edit(
-    "Give the fox a red scarf",
-    [republic.image("fox.png")],
-    mask=republic.image("mask.png"),
-)
-```
-
-`response.image_parts` holds one `republic.Image` per result, with inline data or a URL. `response.images` decodes them with Pillow (install `republic[image]`). `response.revised_prompts` holds any prompts the service rewrote, and `response.token_usage` reports usage when the service does. `edit()` accepts one image or a list. Transparent areas of `mask` mark where the first image changes, on formats that support masks.
-
-`republic.ImageOptions` lists the options: `n`, `size`, `aspect_ratio`, `quality`, `background`, `output_format`, `output_compression`, `moderation`, and `extra_body`. Values follow each service's vocabulary. A format raises `errors.UnsupportedFeatureError` for options it cannot express:
-
-| Format | Providers | Endpoint | Options |
-| --- | --- | --- | --- |
-| `images` | OpenAI, Azure OpenAI | `/images/generations`, `/images/edits` | All except `aspect_ratio` |
-| `gemini_image` | Google | `/models/MODEL:generateContent` | `n`, `size`, `aspect_ratio`, `extra_body`; no masks |
-
-OpenAI edits send images and the mask as `image_url` references in a JSON body, so remote URLs work. Azure OpenAI requires multipart edits and uses `formats.MultipartImagesFormat`, which uploads them as files; edit inputs need inline data there. A custom provider can return `MultipartImagesFormat()` from `select_api_format()` for gateways that accept only multipart edits.
-
-Replace `image-model` with an available image model. Streaming partial images is not supported.
-
-### Decision models
-
-Decision models answer typed questions about state:
-
-```python
-from republic.decisions import Noul
-
-model = republic.get_decision_model("typesafe:decision-model")
-response = await model.decide(
-    "The weather is clear and I have an hour free.",
-    questions={"decision": Noul("Should I go for a walk?")},
-)
-print(response.answers["decision"])
-```
-
-Replace `decision-model` with an available decision model. `Choice`, `Noul`, and `Score` describe the questions; answers use the same IDs. Each provider exposes only the model kinds it supports.
-
-Source: [Frost Ming's Republic specification](https://gist.github.com/frostming/1a454601e435016d8f89a17bd68ad1a4).
+# Provider API
+
+## Models
+
+GetModel, GetEmbeddingModel, GetImageModel and GetDecisionModel accept a
+`provider:model` specification and ProviderConfig. The corresponding Provider
+methods accept a bare model name and share the provider's HTTP client.
+
+- Chat(ctx, prompt, options) returns Response.
+- Stream(ctx, prompt, options) returns a single-pass Stream. Iterate Events(),
+  close it, and read Response() after completed. Early access returns
+  ErrStreamNotFinished.
+- Embed(ctx, text, dimensions) and EmbedMany(ctx, texts, dimensions) return ordered
+  vectors. A nil dimensions pointer omits the option.
+- Generate(ctx, prompt, options) and Edit(ctx, prompt, images, mask, options) return
+  ImageResponse. Edits require at least one image. Masks are optional and
+  unsupported by Gemini.
+- Decide(ctx, state, questions) returns answers keyed by question ID. Construct
+  questions using Noul, Choice and Score.
+- Provider.ListModels(ctx) follows pagination and returns ModelInfo entries.
+
+Close providers after all active work finishes. Closing a model closes its shared
+provider. Caller-supplied HTTP clients remain usable. A provider is safe for
+concurrent requests; a single stream is consumed by one goroutine. Configuration
+and model fields must not be mutated during active calls.
+
+## Messages and media
+
+System(text), User(parts...), Assistant(parts...) and ToolResult(call, isError,
+parts...) construct messages. Text and Reasoning construct readable parts.
+ToolCalls is an explicit assistant-message field. ProviderData is opaque and is
+replayed only to its matching format.
+
+Image(source, mediaType), Audio and Video accept a file path, remote URL, data URL
+or []byte. Raw bytes require a MIME type. Remote URLs are not downloaded. A Part
+provides Base64Data() and DataURL(); its inline bytes can be decoded using Go's
+image libraries. JSON message serialization preserves typed media and metadata.
+
+Use Message.Text() and Reasoning() for concatenated readable content. ToolCall.Args()
+decodes JSON arguments, treating an empty argument string as an empty object.
+
+## Responses and events
+
+Response includes Message, TokenUsage, Output, FinishReason, Refusal, Citations,
+BuiltinToolCalls, ID, Model, RequestID and Headers. Text(), Reasoning(), ToolCalls()
+and ImageParts() are convenience accessors. TokenUsage.TotalTokens() includes
+prompt and output tokens; cached tokens are a subset of prompt tokens.
+
+Event.Type is text_delta, reasoning_delta, refusal_delta, tool_call_delta,
+tool_call_ready, usage_delta, image_ready, citation_added,
+builtin_tool_call_ready or completed. Usage deltas sum to final usage. Calls are
+released once; incomplete streams never emit completed or write history.
+
+## History
+
+NewHistory(maxEntries) creates a synchronized InMemoryHistory. Zero is unbounded;
+negative values fail. Bounded history restarts at a user message after trimming,
+so retained tool results are not separated from their calls. Implement History
+for external persistence and assign it to ChatModel.History before use.
+
+## Errors and custom formats
+
+Use errors.As with *republic.Error and inspect Kind. HTTP status errors retain
+StatusCode, Body, Headers and RequestID. Connection/timeout errors preserve Cause.
+Context cancellation can be checked with errors.Is. Stream truncation returns
+ErrStreamIncomplete even if a finish reason appeared without a terminal marker.
+
+RegisterProvider installs a ProviderSpec. SelectFormat can return any ChatFormat
+implementation. Embed WireFormat to reuse existing behavior and override Build,
+Parse or NewParser. A custom parser emits Delta values for ResponseBuilder and
+must validate completion in Finish. HTTPRequest supports JSON and multipart
+bodies; tools are schemas only and are never executed by formats.
+
+EmbeddingAPIFormat, ImageAPIFormat and DecisionAPIFormat provide equivalent
+interfaces for custom auxiliary protocols. ProviderSpec.SelectEmbeddingFormat,
+SelectImageFormat and SelectDecisionFormat choose them by model name. ModelsParams
+and ParseModels customize model-list pagination and decoding.

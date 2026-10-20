@@ -1,34 +1,21 @@
-# DeepSeek
+# deepseek
 
-Use the `deepseek` provider to call DeepSeek with an API key. Chat requests default to Chat Completions; Responses and Anthropic Messages are also available.
+Default API base: `https://api.deepseek.com`.
+Supported formats, in preference order: `chat`, `responses`, `messages`.
 
-## Get started
-
-Install Republic using the [quickstart](../quickstart.md#install-republic), set `REPUBLIC_DEEPSEEK_API_KEY`, and replace `MODEL_ID` with a model available to your account:
-
-```python
-import asyncio
-
-import republic
-
-
-async def main():
-    model = republic.get_model("deepseek:MODEL_ID")
-    response = await model.chat("Say hello in one sentence.")
-    print(response.text)
-
-
-asyncio.run(main())
+```go
+model, err := republic.GetModel("deepseek:MODEL_ID", republic.ProviderConfig{})
+if err != nil { return err }
+defer model.Close()
 ```
 
-## Authentication
+Chat uses max_tokens and replays reasoning_content. Messages requests are routed under `/anthropic/v1`. The selected format controls which options can be expressed.
 
-Republic reads `REPUBLIC_DEEPSEEK_API_KEY` when the provider is created and sends the key in the `Authorization: Bearer` header. You can pass a key loaded by your application as `api_key=`; see [API-key authentication](../guides/authentication.md#use-an-api-key).
+API keys and base URLs can be provided through `ProviderConfig` or
+`REPUBLIC_DEEPSEEK_API_KEY` and
+`REPUBLIC_DEEPSEEK_API_BASE`. `EnvPrefix` changes the prefix.
+An explicitly selected APIFormat only affects models of the same kind;
+embedding, image and decision models still select their supported format.
 
-## Model support
-
-Chat requests send `max_tokens`, and `reasoning_effort="none"` turns thinking off. Thinking models return reasoning in `response.reasoning`. Republic sends `reasoning_content` back with earlier assistant messages, which these models require across tool calls; keep `response.message` in the conversation.
-
-Select `api_format="responses"` or `api_format="messages"` to use another format. Messages requests go to DeepSeek's Anthropic-compatible endpoint, `https://api.deepseek.com/anthropic`, while `api_base` stays `https://api.deepseek.com`.
-
-See [configuration](../reference/configuration.md) for endpoint overrides and request options.
+See [authentication](../guides/authentication.md) and
+[configuration](../reference/configuration.md).

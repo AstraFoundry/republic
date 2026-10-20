@@ -55,6 +55,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - uses: ./.github/actions/setup-python-env
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
       - name: Prepare Git authentication
         run: gh auth setup-git
       - name: Read dependency update publishing identity

@@ -1,32 +1,21 @@
-# Ollama
+# ollama
 
-Use the `ollama` provider to call a local Ollama server or Ollama Cloud. It supports chat and embeddings. Chat requests default to Chat Completions; stateless Responses requires Ollama 0.13.3 or later.
+Default API base: `http://localhost:11434/v1`.
+Supported formats, in preference order: `chat`, `responses`, `embeddings`.
 
-## Get started
-
-Install Republic using the [quickstart](../quickstart.md#install-republic), start Ollama, and replace `MODEL_ID` with a pulled model:
-
-```python
-import asyncio
-
-import republic
-
-
-async def main():
-    model = republic.get_model("ollama:MODEL_ID")
-    response = await model.chat("Say hello in one sentence.")
-    print(response.text)
-
-
-asyncio.run(main())
+```go
+model, err := republic.GetModel("ollama:MODEL_ID", republic.ProviderConfig{})
+if err != nil { return err }
+defer model.Close()
 ```
 
-## Authentication
+Defaults to a local server. For Ollama Cloud, set APIBase to `https://ollama.com/v1` and supply an API key. Chat uses max_tokens. Responses is stateless and depends on server support.
 
-A local server needs no key, and Republic sends no `Authorization` header unless `REPUBLIC_OLLAMA_API_KEY` or `api_key=` is set. For Ollama Cloud, set `REPUBLIC_OLLAMA_API_BASE=https://ollama.com/v1` and an API key from your Ollama account.
+API keys and base URLs can be provided through `ProviderConfig` or
+`REPUBLIC_OLLAMA_API_KEY` and
+`REPUBLIC_OLLAMA_API_BASE`. `EnvPrefix` changes the prefix.
+An explicitly selected APIFormat only affects models of the same kind;
+embedding, image and decision models still select their supported format.
 
-## Model support
-
-The default endpoint is `http://localhost:11434/v1`. Chat requests send `max_tokens`. Select `api_format="responses"` for stateless Responses. Use `get_embedding_model()` for embedding models.
-
-See [configuration](../reference/configuration.md) for endpoint overrides and request options.
+See [authentication](../guides/authentication.md) and
+[configuration](../reference/configuration.md).

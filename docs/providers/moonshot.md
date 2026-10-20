@@ -1,32 +1,21 @@
-# Moonshot AI (Kimi)
+# moonshot
 
-Use the `moonshot` provider to call Kimi models with an API key. Chat uses Chat Completions.
+Default API base: `https://api.moonshot.ai/v1`.
+Supported formats, in preference order: `chat`.
 
-## Get started
-
-Install Republic using the [quickstart](../quickstart.md#install-republic), set `REPUBLIC_MOONSHOT_API_KEY`, and replace `MODEL_ID` with a model available to your account:
-
-```python
-import asyncio
-
-import republic
-
-
-async def main():
-    model = republic.get_model("moonshot:MODEL_ID")
-    response = await model.chat("Say hello in one sentence.")
-    print(response.text)
-
-
-asyncio.run(main())
+```go
+model, err := republic.GetModel("moonshot:MODEL_ID", republic.ProviderConfig{})
+if err != nil { return err }
+defer model.Close()
 ```
 
-## Authentication
+Chat replays reasoning_content for tool continuations. APIBase may be `https://api.moonshot.cn/v1` for China.
 
-Republic reads `REPUBLIC_MOONSHOT_API_KEY` when the provider is created and sends the key in the `Authorization: Bearer` header. You can pass a key loaded by your application as `api_key=`; see [API-key authentication](../guides/authentication.md#use-an-api-key).
+API keys and base URLs can be provided through `ProviderConfig` or
+`REPUBLIC_MOONSHOT_API_KEY` and
+`REPUBLIC_MOONSHOT_API_BASE`. `EnvPrefix` changes the prefix.
+An explicitly selected APIFormat only affects models of the same kind;
+embedding, image and decision models still select their supported format.
 
-## Model support
-
-The default endpoint is `https://api.moonshot.ai/v1`; set `api_base="https://api.moonshot.cn/v1"` for the China platform. Thinking models return reasoning in `response.reasoning`. Republic sends `reasoning_content` back with earlier assistant messages, which these models require across tool calls; keep `response.message` in the conversation. Pass model-specific thinking options, such as `thinking`, through `extra_body`.
-
-See [configuration](../reference/configuration.md) for endpoint overrides and request options.
+See [authentication](../guides/authentication.md) and
+[configuration](../reference/configuration.md).

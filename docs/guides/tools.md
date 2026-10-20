@@ -1,41 +1,46 @@
-# Return tool results to a model
+# Tool use
 
-A tool round trip has three parts: declare a schema, execute the calls in the response, then send the results with the original assistant message.
+Republic declares tools and returns calls. The caller validates arguments and
+executes tools. Function schemas are JSON Schema objects.
 
-The [minimal agent tutorial](minimal-agent.md) defines a `read_file` tool and an `execute()` function in `agent.py`. Save that script first. This example imports them and performs one round, so you can see exactly which messages are sent:
-
-```python
-import asyncio
-
-from agent import execute, read_file
-
-import republic
-
-
-async def main():
-    model = republic.get_model("openai:gpt-6-sol")
-    task = "Read pyproject.toml and report the supported Python versions."
-    response = await model.chat(task, tools=[read_file], tool_choice=read_file)
-    if not response.tool_calls:
-        print(response.refusal or response.text)
-        return
-
-    results = [execute(call) for call in response.tool_calls]
-    answer = await model.chat([task, response.message, *results])
-    print(answer.refusal or answer.text)
-
-
-asyncio.run(main())
+```go
+weather := republic.Tool{
+    Name: "weather",
+    Description: "Get the weather for a city",
+    Parameters: map[string]any{
+        "type": "object",
+        "properties": map[string]any{"city": map[string]any{"type": "string"}},
+        "required": []string{"city"},
+    },
+}
+response, err := model.Chat(ctx, "Weather in Paris?", republic.Options{
+    "tools": []republic.Tool{weather},
+    "tool_choice": "auto",
+})
+if err != nil { return err }
+messages := []republic.Message{republic.User(republic.Text("Weather in Paris?")), response.Message}
+for _, call := range response.ToolCalls() {
+    args, err := call.Args()
+    if err != nil { return err }
+    _ = args // Validate and execute in your application.
+    messages = append(messages, republic.ToolResult(call, false, republic.Text("Sunny")))
+}
 ```
 
-Run this script from the same project directory as `agent.py`. `tool_choice=read_file` asks for that specific tool, so choose a model that supports explicit tool choice. A refusal can still produce a response with no calls.
+Pass a Tool as tool_choice to require that function. Other choices are auto, none
+and required. Strict is sent where supported; Gemini rejects strict function tools.
 
-`call.args` decodes the model's JSON arguments. The executor checks the tool name and permitted filenames before reading anything. A JSON decoding error propagates to the application; a schema alone does not validate the arguments locally.
+ToolResult retains the full call, including provider signatures. An orphan result
+is automatically preceded by an assistant announcement. Preserve response.Message
+for continuations; rebuilding it from text loses reasoning and provider data.
 
-`republic.tool(call, ...)` builds a `tool` message that keeps the original call with its output, including the ID needed to associate the result with that call. The output may mix text, images, audio, and videos, such as `republic.tool(call, "Captured", republic.image("shot.png"))`; pass `is_error=True` to report a failed call. Media support in tool results depends on the provider and API format: the Gemini format accepts only inline media there, and OpenAI's own Chat Completions service accepts only text in tool messages, although some compatible gateways accept images. `response.message` also preserves reasoning blocks, signed calls, and other provider data needed for the next turn. Replacing it with `response.text` loses that state.
+## Provider-side tools
 
-The second request completes this round without offering more tools. To allow another round, supply the schemas again and repeat the sequence, as the minimal agent does. With an attached history object, the first assistant message is already recorded; send only the new results instead of appending the same conversation twice.
+WebSearch(), WebFetch(), CodeExecution() and ImageGeneration() return BuiltinTool
+values. Configure MaxUses, AllowedDomains, BlockedDomains and UserLocation where
+supported. Mix function and built-in tools using `[]any`. NativeTool(format, body)
+sends a provider-native declaration only through its matching format.
 
-During streaming, `ToolCallDelta` carries argument fragments. Use `ToolCallReady` or the completed response when you need a finished call. Preserve its metadata when returning the result.
-
-Provider-run tools, such as `republic.tools.WebSearch`, execute at the service and expose activity through `response.builtin_tool_calls`. They go in `tools=` too, but do not use the application's `execute()` function.
+Unsupported tools and settings return ErrUnsupportedFeature. Results expose
+BuiltinToolCalls and Citations. Streaming emits builtin_tool_call_ready and
+citation_added alongside text. Republic never executes these tools locally.

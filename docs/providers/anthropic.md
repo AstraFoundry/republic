@@ -1,32 +1,21 @@
-# Anthropic API
+# anthropic
 
-Use the `anthropic` provider to call Claude with an API key. Chat and streaming use the Messages API format.
+Default API base: `https://api.anthropic.com/v1`.
+Supported formats, in preference order: `messages`.
 
-## Get started
-
-Install Republic using the [quickstart](../quickstart.md#install-republic), set `REPUBLIC_ANTHROPIC_API_KEY`, and replace `MODEL_ID` with a model available to your account:
-
-```python
-import asyncio
-
-import republic
-
-
-async def main():
-    model = republic.get_model("anthropic:MODEL_ID")
-    response = await model.chat("Say hello in one sentence.", max_tokens=256)
-    print(response.text)
-
-
-asyncio.run(main())
+```go
+model, err := republic.GetModel("anthropic:MODEL_ID", republic.ProviderConfig{})
+if err != nil { return err }
+defer model.Close()
 ```
 
-## Authentication
+API keys use `x-api-key`; requests include `anthropic-version: 2023-06-01`. The default max_tokens is 16000. Thinking and server-tool blocks are preserved for replay. Consecutive messages of the same wire role are merged.
 
-Republic reads `REPUBLIC_ANTHROPIC_API_KEY` when the provider is created and sends the key in the `x-api-key` header. You can pass a key loaded by your application as `api_key=`; see [API-key authentication](../guides/authentication.md#use-an-api-key).
+API keys and base URLs can be provided through `ProviderConfig` or
+`REPUBLIC_ANTHROPIC_API_KEY` and
+`REPUBLIC_ANTHROPIC_API_BASE`. `EnvPrefix` changes the prefix.
+An explicitly selected APIFormat only affects models of the same kind;
+embedding, image and decision models still select their supported format.
 
-## Model support
-
-Use `chat()` for a complete response or `stream()` for events. Messages is the only supported format for this provider. Set `max_tokens` to the output limit you need; reasoning and tool capabilities depend on the selected model.
-
-See [configuration](../reference/configuration.md) for endpoint overrides and request options.
+See [authentication](../guides/authentication.md) and
+[configuration](../reference/configuration.md).

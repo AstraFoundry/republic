@@ -1,8 +1,8 @@
 # Project instructions
 
-Republic is a Python provider library. Keep gateways, agent loops, and tool execution outside the package. Use English in repository files and GitHub contributions.
+Republic is a Go provider library. Keep gateways, agent loops, and tool execution outside the package. Use English in repository files and GitHub contributions. The unchanged Python package is retained as an executable compatibility oracle.
 
-Use the prepared uv environment. Run `uv run prek run --all-files`, `uv run ty check`, and affected behavior tests before publishing implementation changes. Main checks Python 3.11–3.14 and builds the package.
+Use the prepared uv environment for oracle checks. Run `uv run prek run --all-files`, `uv run ty check`, `go vet ./...`, `go test -race ./...`, `REPUBLIC_PYTHON_PARITY=1 go test ./...`, and affected behavior tests before publishing implementation changes. Main checks Go on Linux, macOS and Windows, checks Python 3.11–3.14, and builds both implementations.
 
 For fixes, use a task-named branch and the prepared Git identity. Publish the candidate PR, then start native CI explicitly when using the workflow token:
 

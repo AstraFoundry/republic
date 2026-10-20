@@ -1,134 +1,53 @@
-# Contributing to `republic`
+# Contributing
 
-Contributions are welcome, and they are greatly appreciated!
-Every little bit helps, and credit will always be given.
+Republic is a Go provider library. Keep gateways, agent loops and tool execution
+in caller code. Repository files and GitHub contributions use English.
 
-You can contribute in many ways:
+## Setup
 
-# Types of Contributions
+Install Go 1.23+ and uv, then run `make install`. Create a task-named branch such
+as `codex/fix-stream-completion`.
 
-## Report Bugs
+The Go package is at the repository root. The retained Python package under
+`src/republic` is an executable compatibility oracle. Do not modify its behavior
+to make a Go parity test pass. Original protocol recordings, licenses and
+attribution remain in `tests/test_provider_golden`.
 
-Report bugs at https://github.com/bubbuild/republic/issues
+## Validation
 
-If you are reporting a bug, please include:
+Before publishing implementation changes:
 
-- Your operating system name and version.
-- Any details about your local setup that might be helpful in troubleshooting.
-- Detailed steps to reproduce the bug.
-
-## Fix Bugs
-
-Look through the GitHub issues for bugs.
-Anything tagged with "bug" and "help wanted" is open to whoever wants to implement a fix for it.
-
-## Implement Features
-
-Look through the GitHub issues for features.
-Anything tagged with "enhancement" and "help wanted" is open to whoever wants to implement it.
-
-## Write Documentation
-
-republic could always use more documentation, whether as part of the official docs, in docstrings, or even on the web in blog posts, articles, and such.
-
-## Submit Feedback
-
-The best way to send feedback is to file an issue at https://github.com/bubbuild/republic/issues.
-
-If you are proposing a new feature:
-
-- Explain in detail how it would work.
-- Keep the scope as narrow as possible, to make it easier to implement.
-- Remember that this is a volunteer-driven project, and that contributions
-  are welcome :)
-
-# Get Started!
-
-Ready to contribute? Here's how to set up `republic` for local development.
-Please note this documentation assumes you already have `uv` and `Git` installed and ready to go.
-
-1. Fork the `republic` repo on GitHub.
-
-2. Clone your fork locally:
-
-```bash
-cd <directory_in_which_repo_should_be_created>
-git clone git@github.com:YOUR_NAME/republic.git
-```
-
-3. Now we need to install the environment. Navigate into the directory
-
-```bash
-cd republic
-```
-
-Then, install and activate the environment with:
-
-```bash
-uv sync
-```
-
-4. Install prek to run linters/formatters at commit time:
-
-```bash
-uv run prek install
-```
-
-5. Create a branch for local development:
-
-```bash
-git checkout -b name-of-your-bugfix-or-feature
-```
-
-Now you can make your changes locally.
-
-6. Don't forget to add test cases for your added functionality to the `tests` directory.
-
-7. When you're done making changes, check that your changes pass the formatting tests.
-
-```bash
+```sh
 make check
-```
-
-Now, validate that all unit tests are passing:
-
-```bash
 make test
+make parity
+make build
+make docs-test
 ```
 
-9. Before raising a pull request you should also run tox.
-   This will run the tests across different versions of Python:
+`make check` runs Go formatting/vet plus the required
+`uv run prek run --all-files` and `uv run ty check`.
+`make test` includes the race detector. `make parity` runs live differential
+request/response comparisons and all original Python behavior tests. Tests use
+local HTTP servers, temporary credential stores and recorded responses.
 
-```bash
-tox
+Run `make fuzz` when changing message serialization or protocol parsers. Add
+regression cases for failures, not just happy paths. Check stream cancellation,
+metadata replay, history writes, retries and client ownership when affected.
+
+CI tests Go on Linux, macOS and Windows, checks the minimum Go version, and runs
+the Python oracle across Python 3.11–3.14. Python package builds continue as
+an oracle integrity check; the Go module is consumed from Git tags.
+
+## Publishing a candidate
+
+Push the task branch and open a candidate PR. When using the workflow token,
+explicitly dispatch native CI with the full candidate commit SHA:
+
+```sh
+gh workflow run main.yml --ref BRANCH -f number=PR_NUMBER -f head=CANDIDATE_SHA
 ```
 
-This requires you to have multiple versions of python installed.
-This step is also triggered in the CI/CD pipeline, so you could also choose to skip this step locally.
-
-10. Commit your changes and push your branch to GitHub:
-
-```bash
-git add .
-git commit -m "Your detailed description of your changes."
-git push origin name-of-your-bugfix-or-feature
-```
-
-11. Submit a pull request through the GitHub website.
-
-# Pull Request Guidelines
-
-Before you submit a pull request, check that it meets these guidelines:
-
-1. The pull request should include tests.
-
-2. If the pull request adds functionality, the docs should be updated.
-   Put your new functionality into a function with a docstring, and add the feature to the list in `README.md`.
-
-## Documentation and releases
-
-Run `make docs-test` to check the site or `make docs` to preview it locally.
-
-Pull requests target `main`. Documentation deploys to https://getrepublic.org on pushes to `main`; the Docs workflow also supports manual dispatch. Publishing a GitHub release builds its tagged revision and uploads it to PyPI using the repository's `PYPI_TOKEN` secret. Package versions come from Git tags.
-
-Dependency maintenance runs weekly or manually, opens draft update PRs, and can repair failing dependency PRs. Real-time security alert updates require an external webhook receiver.
+Link the PR and pending checks. Do not wait for the Landing feedback job.
+Go releases use semantic Git tags; publishing a candidate does not create a
+release or deploy documentation.
