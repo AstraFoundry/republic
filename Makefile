@@ -1,44 +1,34 @@
-.PHONY: install
-install: ## Install the virtual environment and install the pre-commit hooks
-	@echo "🚀 Creating virtual environment using uv"
-	@uv sync
-	@uv run prek install
+.PHONY: install check test parity build docs-test docs fuzz
 
-.PHONY: check
-check: ## Run code quality tools.
-	@echo "🚀 Checking lock file consistency with 'pyproject.toml'"
-	@uv lock --locked
-	@echo "🚀 Linting code: Running prek"
-	@uv run prek run -a
-	@echo "🚀 Static type checking: Running ty"
-	@uv run ty check
+install: ## Install Go dependencies and Python compatibility tooling
+	go mod download
+	uv sync
+	uv run prek install
 
-.PHONY: test
-test: ## Test the code with pytest
-	@echo "🚀 Testing code: Running pytest"
-	@uv run python -m pytest --doctest-modules
+check: ## Check the Go implementation and retained Python oracle
+	test -z "$$(gofmt -l *.go examples/chat/*.go)"
+	go vet ./...
+	uv run prek run --all-files
+	uv run ty check
 
-.PHONY: build
-build: clean-build ## Build wheel file
-	@echo "🚀 Creating wheel file"
-	@uvx --from build pyproject-build --installer uv
+test: ## Run native Go behavior and race tests
+	go test -race -cover ./...
 
-.PHONY: clean-build
-clean-build: ## Clean build artifacts
-	@echo "🚀 Removing build artifacts"
-	@uv run python -c "import shutil; import os; shutil.rmtree('dist') if os.path.exists('dist') else None"
+parity: ## Compare Go with Python and run the original suite
+	REPUBLIC_PYTHON_PARITY=1 go test ./...
+	uv run pytest -q
 
-.PHONY: docs-test
-docs-test: ## Build the documentation with strict checks
-	@uv run --frozen --group docs zensical build --clean --strict
+build: ## Build Go packages and examples
+	go build ./...
 
-.PHONY: docs
-docs: ## Serve the documentation locally
-	@uv run --frozen --group docs zensical serve
+fuzz: ## Exercise parser and message decoder fuzz targets
+	go test -run '^$$' -fuzz '^FuzzStreamParser$$' -fuzztime=10s
+	go test -run '^$$' -fuzz '^FuzzMessageJSON$$' -fuzztime=10s
 
-.PHONY: help
-help:
-	@uv run python -c "import re; \
-	[[print(f'\033[36m{m[0]:<20}\033[0m {m[1]}') for m in re.findall(r'^([a-zA-Z_-]+):.*?## (.*)$$', open(makefile).read(), re.M)] for makefile in ('$(MAKEFILE_LIST)').strip().split()]"
+docs-test: ## Build documentation with strict checks
+	uv run --frozen --group docs zensical build --clean --strict
 
-.DEFAULT_GOAL := help
+docs: ## Serve documentation locally
+	uv run --frozen --group docs zensical serve
+
+.DEFAULT_GOAL := test

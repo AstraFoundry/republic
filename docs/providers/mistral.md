@@ -1,36 +1,21 @@
-# Mistral AI
+# mistral
 
-Use the `mistral` provider to call Mistral with an API key. It supports chat and embeddings. Chat uses Chat Completions.
+Default API base: `https://api.mistral.ai/v1`.
+Supported formats, in preference order: `chat`, `embeddings`.
 
-## Get started
-
-Install Republic using the [quickstart](../quickstart.md#install-republic), set `REPUBLIC_MISTRAL_API_KEY`, and replace `MODEL_ID` with a model available to your account:
-
-```python
-import asyncio
-
-import republic
-
-
-async def main():
-    model = republic.get_model("mistral:MODEL_ID")
-    response = await model.chat("Say hello in one sentence.")
-    print(response.text)
-
-
-asyncio.run(main())
+```go
+model, err := republic.GetModel("mistral:MODEL_ID", republic.ProviderConfig{})
+if err != nil { return err }
+defer model.Close()
 ```
 
-## Authentication
+Chat uses max_tokens and random_seed; top_k is rejected. Mistral thinking content is parsed and replayed. Embedding dimensions map to output_dimension.
 
-Republic reads `REPUBLIC_MISTRAL_API_KEY` when the provider is created and sends the key in the `Authorization: Bearer` header. You can pass a key loaded by your application as `api_key=`; see [API-key authentication](../guides/authentication.md#use-an-api-key).
+API keys and base URLs can be provided through `ProviderConfig` or
+`REPUBLIC_MISTRAL_API_KEY` and
+`REPUBLIC_MISTRAL_API_BASE`. `EnvPrefix` changes the prefix.
+An explicitly selected APIFormat only affects models of the same kind;
+embedding, image and decision models still select their supported format.
 
-## Model support
-
-Chat requests send `max_tokens`, map `seed` to `random_seed`, and omit `stream_options` because Mistral reports usage in the last chunk. `top_k` raises `errors.UnsupportedFeatureError`.
-
-With `reasoning_effort`, reasoning models return thinking chunks, which Republic exposes as `response.reasoning`. Earlier thinking is sent back as a thinking chunk; keep `response.message` in the conversation.
-
-For embedding models, use `get_embedding_model()`; `dimensions=` is sent as `output_dimension`.
-
-See [configuration](../reference/configuration.md) for endpoint overrides and request options.
+See [authentication](../guides/authentication.md) and
+[configuration](../reference/configuration.md).

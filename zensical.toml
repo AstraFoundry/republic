@@ -1,10 +1,10 @@
 [project]
 site_name = "Republic"
 site_url = "https://getrepublic.org/"
-site_description = "A Python library for AI providers."
+site_description = "A Go library for AI providers."
 site_author = "Bub Build"
-repo_url = "https://github.com/bubbuild/republic"
-repo_name = "bubbuild/republic"
+repo_url = "https://github.com/AstraFoundry/republic"
+repo_name = "AstraFoundry/republic"
 edit_uri = "edit/main/docs/"
 copyright = "Copyright (c) 2026 Bub Build contributors."
 

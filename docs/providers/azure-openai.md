@@ -1,40 +1,21 @@
-# Azure OpenAI
+# azure-openai
 
-Use the `azure-openai` provider to call Azure OpenAI deployments through the v1 API. It supports chat, embeddings, and images. Chat requests default to Responses; Chat Completions is also available.
+Default API base: `(resource required)`.
+Supported formats, in preference order: `responses`, `chat`, `embeddings`, `images`.
 
-## Get started
-
-Install Republic using the [quickstart](../quickstart.md#install-republic), set `REPUBLIC_AZURE_OPENAI_API_KEY`, set `REPUBLIC_AZURE_OPENAI_RESOURCE` to your resource name, and replace `DEPLOYMENT` with a deployment name:
-
-```python
-import asyncio
-
-import republic
-
-
-async def main():
-    model = republic.get_model("azure-openai:DEPLOYMENT")
-    response = await model.chat("Say hello in one sentence.")
-    print(response.text)
-
-
-asyncio.run(main())
+```go
+model, err := republic.GetModel("azure-openai:MODEL_ID", republic.ProviderConfig{})
+if err != nil { return err }
+defer model.Close()
 ```
 
-## Authentication
+Set `Resource` or `REPUBLIC_AZURE_OPENAI_RESOURCE`, or provide a full APIBase ending in `/openai/v1`. Model names are deployment names. Keys use the `api-key` header. Image edits upload multipart data and require inline images and masks.
 
-Republic reads `REPUBLIC_AZURE_OPENAI_API_KEY` when the provider is created and sends the key in the `api-key` header. You can pass a key loaded by your application as `api_key=`; see [API-key authentication](../guides/authentication.md#use-an-api-key). For Microsoft Entra ID, pass an `auth=` object that sends `Authorization: Bearer` with a token for the `https://ai.azure.com/.default` scope.
+API keys and base URLs can be provided through `ProviderConfig` or
+`REPUBLIC_AZURE_OPENAI_API_KEY` and
+`REPUBLIC_AZURE_OPENAI_API_BASE`. `EnvPrefix` changes the prefix.
+An explicitly selected APIFormat only affects models of the same kind;
+embedding, image and decision models still select their supported format.
 
-## Model support
-
-The model name is the deployment name. Republic builds the endpoint `https://RESOURCE.openai.azure.com/openai/v1` from the resource name, read from `resource=` on `AzureOpenAI` or `REPUBLIC_AZURE_OPENAI_RESOURCE`. A full `api_base=` or `REPUBLIC_AZURE_OPENAI_API_BASE`, such as a `services.ai.azure.com` endpoint, takes precedence. Creating the provider without a resource or base URL raises `ValueError`.
-
-```python
-from republic.providers import AzureOpenAI
-
-model = AzureOpenAI(resource="my-resource").get_model("DEPLOYMENT")
-```
-
-Select `api_format="chat"` for deployments without Responses support. Use `get_embedding_model()` for embedding deployments and `get_image_model()` for image deployments. Image generation sends the same JSON body as [OpenAI](openai.md#model-support). Azure requires multipart form data for edits, so Republic uploads input images as `image[]` files and the mask as `mask`. Edit inputs therefore need inline data; a URL-only image raises `errors.UnsupportedFeatureError`. Load it with `republic.image(path)` or pass the bytes instead.
-
-See [configuration](../reference/configuration.md) for endpoint overrides and request options.
+See [authentication](../guides/authentication.md) and
+[configuration](../reference/configuration.md).

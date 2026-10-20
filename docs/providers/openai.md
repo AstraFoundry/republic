@@ -1,42 +1,21 @@
-# OpenAI API
+# openai
 
-Use the `openai` provider to call OpenAI with an API key. It supports chat, embeddings, and images. Chat requests default to Responses; Chat Completions is also available.
+Default API base: `https://api.openai.com/v1`.
+Supported formats, in preference order: `responses`, `chat`, `embeddings`, `images`.
 
-## Get started
-
-Install Republic using the [quickstart](../quickstart.md#install-republic), set `REPUBLIC_OPENAI_API_KEY`, and replace `MODEL_ID` with a model available to your account:
-
-```python
-import asyncio
-
-import republic
-
-
-async def main():
-    model = republic.get_model("openai:MODEL_ID")
-    response = await model.chat("Say hello in one sentence.")
-    print(response.text)
-
-
-asyncio.run(main())
+```go
+model, err := republic.GetModel("openai:MODEL_ID", republic.ProviderConfig{})
+if err != nil { return err }
+defer model.Close()
 ```
 
-## Authentication
 
-Republic reads `REPUBLIC_OPENAI_API_KEY` when the provider is created. You can pass a key loaded by your application as `api_key=`; see [API-key authentication](../guides/authentication.md#use-an-api-key).
 
-To use a ChatGPT account login, select the [Codex provider](codex.md).
+API keys and base URLs can be provided through `ProviderConfig` or
+`REPUBLIC_OPENAI_API_KEY` and
+`REPUBLIC_OPENAI_API_BASE`. `EnvPrefix` changes the prefix.
+An explicitly selected APIFormat only affects models of the same kind;
+embedding, image and decision models still select their supported format.
 
-## Model support
-
-To use Chat Completions, replace the model construction above with:
-
-```python
-model = republic.get_model("openai:MODEL_ID", api_format="chat")
-```
-
-For an embedding model, use `get_embedding_model("openai:MODEL_ID")`, then await `embed(text)` or `embed_many(texts)` inside an async function. Choose a model that supports the selected operation.
-
-For an image model, use `get_image_model("openai:MODEL_ID")`, then await `generate(prompt)` or `edit(prompt, images, mask=None)`. They use the `images` format, which calls `/images/generations` and `/images/edits`. Edits send input images and the mask as `image_url` references, so local images and remote URLs both work. See [image models](../reference/provider-api.md#image-models).
-
-See [configuration](../reference/configuration.md) for endpoint overrides and request options.
+See [authentication](../guides/authentication.md) and
+[configuration](../reference/configuration.md).

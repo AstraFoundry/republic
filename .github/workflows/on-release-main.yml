@@ -29,7 +29,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  publish:
+  validate-module:
     runs-on: ubuntu-latest
     steps:
       - name: Check out
@@ -38,13 +38,9 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.release.tag_name }}
 
-      - name: Set up the environment
-        uses: ./.github/actions/setup-python-env
-
-      - name: Build package
-        run: uv build
-
-      - name: Publish package
-        run: uv publish
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+      - run: go mod verify
+      - run: go test -race ./...
+      - run: go build ./...

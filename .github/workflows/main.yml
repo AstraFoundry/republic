@@ -22,6 +22,50 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' || (inputs.number != '' && inputs.number != '0') }}
 
 jobs:
+  go:
+    name: Go (${{ matrix.os }}, ${{ matrix.go }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        go: [stable]
+        include:
+          - os: ubuntu-latest
+            go: '1.23.x'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+      - name: Check formatting
+        if: runner.os != 'Windows'
+        run: test -z "$(gofmt -l *.go examples/chat/*.go)"
+      - run: go vet ./...
+      - run: go test -race -cover ./...
+      - run: go build ./...
+
+  go-parity:
+    name: Go / Python behavioral parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+      - uses: ./.github/actions/setup-python-env
+      - name: Compare requests and recorded responses
+        run: go test ./...
+        env:
+          REPUBLIC_PYTHON_PARITY: '1'
+      - name: Fuzz protocol parsers
+        run: go test -run '^$' -fuzz '^FuzzStreamParser$' -fuzztime=10s
+      - name: Fuzz message serialization
+        run: go test -run '^$' -fuzz '^FuzzMessageJSON$' -fuzztime=10s
+
   quality:
     runs-on: ubuntu-latest
     steps:
@@ -82,7 +126,7 @@ jobs:
 
   landing-feedback:
     name: Landing review
-    needs: [quality, tests-and-type-check, build, check-docs]
+    needs: [go, go-parity, quality, tests-and-type-check, build, check-docs]
     if: >-
       always() && !cancelled() && vars.LANDING_MODEL != '' &&
       ((github.event_name == 'pull_request' && !github.event.pull_request.draft &&
@@ -101,6 +145,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - uses: ./.github/actions/setup-python-env
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
       - name: Review the candidate
         id: landing
         timeout-minutes: 20
@@ -121,7 +168,7 @@ jobs:
           head: ${{ github.event.pull_request.head.sha || inputs.head || '' }}
           checked-revision: ${{ github.sha }}
           instruction: >-
-            Native checks: quality=${{ needs.quality.result }}, tests-and-type-check=${{ needs.tests-and-type-check.result }}, build=${{ needs.build.result }}, check-docs=${{ needs.check-docs.result }}.
+            Native checks: go=${{ needs.go.result }}, go-parity=${{ needs.go-parity.result }}, quality=${{ needs.quality.result }}, tests-and-type-check=${{ needs.tests-and-type-check.result }}, build=${{ needs.build.result }}, check-docs=${{ needs.check-docs.result }}.
             Ignore the Landing review job when assessing native check completion.
             Review affected user-visible behavior against repository guidance. Reuse these check results and relevant review history; investigate unresolved questions and publish useful findings or a brief clean verdict.
       - name: Report unsuccessful feedback

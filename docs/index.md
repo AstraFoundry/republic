@@ -1,15 +1,12 @@
 # Republic
 
-One Python interface for chat, streaming, tool calls, and structured output across AI providers.
+Republic is a Go library with one interface for AI providers. It supports chat,
+streaming, tools, structured output, embeddings, image generation and decisions.
+It does not execute tools or run an agent loop.
 
-```sh
-python -m pip install republic
-```
+Start with the [quickstart](quickstart.md), choose a [provider](providers/index.md),
+then see [configuration](reference/configuration.md) and the
+[API reference](reference/provider-api.md).
 
-Follow the [quickstart](quickstart.md) to send a request and stream a response.
-
-- [Providers](providers/index.md): services, model kinds, API formats, and credentials.
-- [Authentication](guides/authentication.md): API keys, CLI logins, and OAuth.
-- [Tool use](guides/tools.md): execute calls and return their results.
-- [Structured output](guides/structured-output.md): validate responses against Python types.
-- [Configuration](reference/configuration.md) and [provider API](reference/provider-api.md): options and API contracts.
+The Go implementation runs independently of Python. The repository retains the
+original Python implementation exclusively for compatibility testing.
