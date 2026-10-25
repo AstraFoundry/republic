@@ -86,6 +86,48 @@ func TestRequestCompatibility(t *testing.T) {
 		})
 	}
 }
+func TestReasoningNone(t *testing.T) {
+	cases := []struct {
+		format, dialect, key string
+		want                 any
+	}{
+		{"chat", "deepseek", "thinking", map[string]any{"type": "disabled"}},
+		{"chat", "openai", "reasoning_effort", "none"},
+		{"chat", "openrouter", "reasoning", map[string]any{"effort": "none"}},
+		{"responses", "openai", "reasoning", map[string]any{"effort": "none"}},
+		{"responses", "deepseek", "reasoning", map[string]any{"effort": "none"}},
+		{"responses", "codex", "reasoning", map[string]any{"effort": "none"}},
+		{"messages", "anthropic", "thinking", map[string]any{"type": "disabled"}},
+		{"gemini", "google", "generationConfig", map[string]any{"thinkingConfig": map[string]any{"thinkingBudget": float64(0)}}},
+	}
+	for _, c := range cases {
+		t.Run(c.dialect+"/"+c.format, func(t *testing.T) {
+			got, err := (WireFormat{Format: c.format, Dialect: c.dialect}).Build(ChatRequest{
+				Model: "m", Messages: []Message{User(Text("hi"))}, Options: Options{"reasoning_effort": "none"},
+			}, false)
+			if err != nil {
+				t.Fatal(err)
+			}
+			raw, err := json.Marshal(got.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var body map[string]any
+			if err := json.Unmarshal(raw, &body); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(body[c.key], c.want) {
+				t.Fatalf("%s: got %#v", c.key, body[c.key])
+			}
+			if c.dialect == "deepseek" && c.format == "chat" {
+				if _, ok := body["reasoning_effort"]; ok {
+					t.Fatal("deepseek chat kept reasoning_effort")
+				}
+			}
+		})
+	}
+}
+
 func TestFormatsReplayTools(t *testing.T) {
 	call := ToolCall{ID: "c1", Name: "weather", Arguments: `{"city":"Paris"}`, Metadata: map[string]any{"gemini_thought_signature": "sig"}}
 	messages, err := Normalize([]Message{User(Text("hi")), ToolResult(call, false, Text("sunny"))})

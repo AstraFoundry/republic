@@ -479,6 +479,11 @@ func (f WireFormat) reasoning(o Options) map[string]any {
 	include := o["include_reasoning"] == true
 	switch f.Format {
 	case "chat":
+		// DeepSeek's reasoning_effort selects effort only while thinking is on.
+		// none is the separate off switch.
+		if f.Dialect == "deepseek" && effort == "none" {
+			return map[string]any{"thinking": map[string]any{"type": "disabled"}}
+		}
 		if f.Dialect == "openrouter" {
 			m := map[string]any{}
 			if has {
@@ -528,7 +533,11 @@ func (f WireFormat) reasoning(o Options) map[string]any {
 		}
 	case "gemini":
 		m := map[string]any{}
-		if has {
+		// none is a budget of zero. thinkingLevel has no none value, and a
+		// model that rejects a zero budget fails the request.
+		if effort == "none" {
+			m["thinkingBudget"] = 0
+		} else if has {
 			m["thinkingLevel"] = effort
 		}
 		if include {
