@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -175,13 +176,24 @@ func TestDecisions(t *testing.T) {
 	}
 }
 func TestModelPagination(t *testing.T) {
-	for _, provider := range []string{"google", "anthropic", "openai"} {
+	for _, provider := range []string{"google", "anthropic", "openai", "deepseek", "openrouter"} {
 		t.Run(provider, func(t *testing.T) {
 			pages := 0
 			p := auxiliaryProvider(t, provider, func(w http.ResponseWriter, r *http.Request) {
 				pages++
 				if r.Method != "GET" || r.URL.Path != "/models" {
 					t.Error(r.URL)
+				}
+				body, err := io.ReadAll(r.Body)
+				if err != nil {
+					t.Error(err)
+					w.WriteHeader(http.StatusBadRequest)
+					return
+				}
+				if len(body) != 0 || r.ContentLength != 0 || len(r.TransferEncoding) != 0 {
+					t.Errorf("model-list GET has a body: %q, length %d, encoding %v", body, r.ContentLength, r.TransferEncoding)
+					w.WriteHeader(http.StatusForbidden)
+					return
 				}
 				switch provider {
 				case "google":
@@ -219,7 +231,7 @@ func TestModelPagination(t *testing.T) {
 			if len(models) != 2 || models[0].ID != "a" || models[0].DisplayName != "A" || models[1].ID != "b" || models[1].DisplayName != "" {
 				t.Fatal(models)
 			}
-			if provider != "openai" && pages != 2 {
+			if (provider == "google" || provider == "anthropic") && pages != 2 {
 				t.Fatal(pages)
 			}
 		})
