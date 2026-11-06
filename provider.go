@@ -350,9 +350,13 @@ func (p *Provider) request(ctx context.Context, method, format string, r HTTPReq
 		query.Set(k, v)
 	}
 	endpoint.RawQuery = query.Encode()
-	body, contentType, err := encodeBody(r)
-	if err != nil {
-		return nil, err
+	var body []byte
+	var contentType string
+	if method != http.MethodGet {
+		body, contentType, err = encodeBody(r)
+		if err != nil {
+			return nil, err
+		}
 	}
 	retries := 2
 	if p.config.MaxRetries != nil {

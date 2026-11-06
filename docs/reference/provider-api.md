@@ -17,7 +17,8 @@ methods accept a bare model name and share the provider's HTTP client.
   unsupported by Gemini.
 - Decide(ctx, state, questions) returns answers keyed by question ID. Construct
   questions using Noul, Choice and Score.
-- Provider.ListModels(ctx) follows pagination and returns ModelInfo entries.
+- Provider.ListModels(ctx) follows pagination with body-free GET requests and
+  returns ModelInfo entries, matching the Python upstream.
 
 Close providers after all active work finishes. Closing a model closes its shared
 provider. Caller-supplied HTTP clients remain usable. A provider is safe for
